@@ -1,0 +1,468 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		093676B9DE5FC18A635D67FC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02196C55AF21B5A0CC7243C3 /* GameScene.swift */; };
+		0A3100F66F35F2BC67C8426B /* LoveRunApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CA9F933D00BB740F5EA62A /* LoveRunApp.swift */; };
+		0E2B816994E1190D3DB2DEF6 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0741F8F52A7AA98A7A9CB2C7 /* GameRules.swift */; };
+		780BE85AE6CBFB3F8E89C8B7 /* PlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012A580C0C94C39B70BD30B5 /* PlayerNode.swift */; };
+		9BBAFCB93C48C50492D32560 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B547EE52F84A66A525D504A /* GameView.swift */; };
+		A3A62EA62F625F3BF125CAD2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0A8D0F985A7B8E8ADCCB6B59 /* PrivacyInfo.xcprivacy */; };
+		D7CC73B1A3D29EE4C1A30D86 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758C72B5350385B8944A40D9 /* GameRulesTests.swift */; };
+		F01276F1DBDDB3AF00371A82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 170D7D4BBB9CC286FE5CA2C9 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FE5D105DA29D86182EC3AC28 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84E2EC74F874AE9A04BBF9DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36C23D7122CF5417BDC331CB;
+			remoteInfo = LoveRun;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		012A580C0C94C39B70BD30B5 /* PlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNode.swift; sourceTree = "<group>"; };
+		02196C55AF21B5A0CC7243C3 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		0741F8F52A7AA98A7A9CB2C7 /* GameRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRules.swift; sourceTree = "<group>"; };
+		0A8D0F985A7B8E8ADCCB6B59 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		0B547EE52F84A66A525D504A /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		170D7D4BBB9CC286FE5CA2C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		46CA9F933D00BB740F5EA62A /* LoveRunApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveRunApp.swift; sourceTree = "<group>"; };
+		758C72B5350385B8944A40D9 /* GameRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRulesTests.swift; sourceTree = "<group>"; };
+		8859FDAA0982F1B3F82DC823 /* LoveRun.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LoveRun.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		911A27FC97A808B82F5C1FCD /* LoveRunTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LoveRunTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		25E228ACDB63942D9FB364A9 /* LoveRunTests */ = {
+			isa = PBXGroup;
+			children = (
+				758C72B5350385B8944A40D9 /* GameRulesTests.swift */,
+			);
+			path = LoveRunTests;
+			sourceTree = "<group>";
+		};
+		40FE5CB5DED45CE8C25DDE18 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				0741F8F52A7AA98A7A9CB2C7 /* GameRules.swift */,
+				02196C55AF21B5A0CC7243C3 /* GameScene.swift */,
+				012A580C0C94C39B70BD30B5 /* PlayerNode.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		5467F9B391ED433A3BA95AD8 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				0B547EE52F84A66A525D504A /* GameView.swift */,
+				46CA9F933D00BB740F5EA62A /* LoveRunApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		6DA3071228B2C57A1C346AE2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				170D7D4BBB9CC286FE5CA2C9 /* Assets.xcassets */,
+				0A8D0F985A7B8E8ADCCB6B59 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		B00EB4EDA8A37F0E465C2E6A = {
+			isa = PBXGroup;
+			children = (
+				E92F36878036EB5FF83FD804 /* LoveRun */,
+				25E228ACDB63942D9FB364A9 /* LoveRunTests */,
+				CA6C2AC5EB2E21B72529FBF2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CA6C2AC5EB2E21B72529FBF2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8859FDAA0982F1B3F82DC823 /* LoveRun.app */,
+				911A27FC97A808B82F5C1FCD /* LoveRunTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E92F36878036EB5FF83FD804 /* LoveRun */ = {
+			isa = PBXGroup;
+			children = (
+				5467F9B391ED433A3BA95AD8 /* App */,
+				40FE5CB5DED45CE8C25DDE18 /* Game */,
+				6DA3071228B2C57A1C346AE2 /* Resources */,
+			);
+			path = LoveRun;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		31119C3701DB4A3768E99198 /* LoveRunTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8222F8DB8B40136E6E5ED21A /* Build configuration list for PBXNativeTarget "LoveRunTests" */;
+			buildPhases = (
+				9A75BF4AB72729DFEDE01C68 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0298F3E42C93CF18A602956C /* PBXTargetDependency */,
+			);
+			name = LoveRunTests;
+			packageProductDependencies = (
+			);
+			productName = LoveRunTests;
+			productReference = 911A27FC97A808B82F5C1FCD /* LoveRunTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		36C23D7122CF5417BDC331CB /* LoveRun */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 482DD829DF58960D4EF9BFA5 /* Build configuration list for PBXNativeTarget "LoveRun" */;
+			buildPhases = (
+				5BE763BEC9708AC754616233 /* Sources */,
+				9CBFCF85B74EC43421B5C282 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LoveRun;
+			packageProductDependencies = (
+			);
+			productName = LoveRun;
+			productReference = 8859FDAA0982F1B3F82DC823 /* LoveRun.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		84E2EC74F874AE9A04BBF9DA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					31119C3701DB4A3768E99198 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					36C23D7122CF5417BDC331CB = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = B65E78BB3F0E4AD034ECA483 /* Build configuration list for PBXProject "LoveRun" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = B00EB4EDA8A37F0E465C2E6A;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CA6C2AC5EB2E21B72529FBF2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				36C23D7122CF5417BDC331CB /* LoveRun */,
+				31119C3701DB4A3768E99198 /* LoveRunTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9CBFCF85B74EC43421B5C282 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F01276F1DBDDB3AF00371A82 /* Assets.xcassets in Resources */,
+				A3A62EA62F625F3BF125CAD2 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5BE763BEC9708AC754616233 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0E2B816994E1190D3DB2DEF6 /* GameRules.swift in Sources */,
+				093676B9DE5FC18A635D67FC /* GameScene.swift in Sources */,
+				9BBAFCB93C48C50492D32560 /* GameView.swift in Sources */,
+				0A3100F66F35F2BC67C8426B /* LoveRunApp.swift in Sources */,
+				780BE85AE6CBFB3F8E89C8B7 /* PlayerNode.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9A75BF4AB72729DFEDE01C68 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7CC73B1A3D29EE4C1A30D86 /* GameRulesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0298F3E42C93CF18A602956C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36C23D7122CF5417BDC331CB /* LoveRun */;
+			targetProxy = FE5D105DA29D86182EC3AC28 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		275E338BE34256CCCA8AA755 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Love Run";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macrilege.LoveRun;
+				PRODUCT_MODULE_NAME = LoveRun;
+				PRODUCT_NAME = LoveRun;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6D67FCFA75B119128370016B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macrilege.LoveRunTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoveRun.app/LoveRun";
+			};
+			name = Release;
+		};
+		72965D0DDC1D7E2EDF07F55C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Love Run";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macrilege.LoveRun;
+				PRODUCT_MODULE_NAME = LoveRun;
+				PRODUCT_NAME = LoveRun;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A811D6FA2D2AB5AF171DCB42 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		E027B52FF5EC2AA1C3601837 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		FC12BBB630D7978AFE825A77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macrilege.LoveRunTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoveRun.app/LoveRun";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		482DD829DF58960D4EF9BFA5 /* Build configuration list for PBXNativeTarget "LoveRun" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72965D0DDC1D7E2EDF07F55C /* Debug */,
+				275E338BE34256CCCA8AA755 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8222F8DB8B40136E6E5ED21A /* Build configuration list for PBXNativeTarget "LoveRunTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC12BBB630D7978AFE825A77 /* Debug */,
+				6D67FCFA75B119128370016B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B65E78BB3F0E4AD034ECA483 /* Build configuration list for PBXProject "LoveRun" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A811D6FA2D2AB5AF171DCB42 /* Debug */,
+				E027B52FF5EC2AA1C3601837 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 84E2EC74F874AE9A04BBF9DA /* Project object */;
+}
