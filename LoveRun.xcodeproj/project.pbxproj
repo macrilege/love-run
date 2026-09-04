@@ -10,9 +10,11 @@
 		093676B9DE5FC18A635D67FC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02196C55AF21B5A0CC7243C3 /* GameScene.swift */; };
 		0A3100F66F35F2BC67C8426B /* LoveRunApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CA9F933D00BB740F5EA62A /* LoveRunApp.swift */; };
 		0E2B816994E1190D3DB2DEF6 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0741F8F52A7AA98A7A9CB2C7 /* GameRules.swift */; };
+		5C0CAA3CF1D7F7B4A4EE3C78 /* LoveRunScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C01CD6AC6453E7FFBE06877 /* LoveRunScene.swift */; };
 		780BE85AE6CBFB3F8E89C8B7 /* PlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012A580C0C94C39B70BD30B5 /* PlayerNode.swift */; };
 		9BBAFCB93C48C50492D32560 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B547EE52F84A66A525D504A /* GameView.swift */; };
 		A3A62EA62F625F3BF125CAD2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0A8D0F985A7B8E8ADCCB6B59 /* PrivacyInfo.xcprivacy */; };
+		B2C2BF2E4F1D6D094DE32B09 /* LevelDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72C2B282C64ECB15C0800E5 /* LevelDefinition.swift */; };
 		D7CC73B1A3D29EE4C1A30D86 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758C72B5350385B8944A40D9 /* GameRulesTests.swift */; };
 		F01276F1DBDDB3AF00371A82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 170D7D4BBB9CC286FE5CA2C9 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -34,10 +36,12 @@
 		0A8D0F985A7B8E8ADCCB6B59 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		0B547EE52F84A66A525D504A /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		170D7D4BBB9CC286FE5CA2C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3C01CD6AC6453E7FFBE06877 /* LoveRunScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveRunScene.swift; sourceTree = "<group>"; };
 		46CA9F933D00BB740F5EA62A /* LoveRunApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveRunApp.swift; sourceTree = "<group>"; };
 		758C72B5350385B8944A40D9 /* GameRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRulesTests.swift; sourceTree = "<group>"; };
 		8859FDAA0982F1B3F82DC823 /* LoveRun.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LoveRun.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		911A27FC97A808B82F5C1FCD /* LoveRunTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LoveRunTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A72C2B282C64ECB15C0800E5 /* LevelDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelDefinition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -54,6 +58,8 @@
 			children = (
 				0741F8F52A7AA98A7A9CB2C7 /* GameRules.swift */,
 				02196C55AF21B5A0CC7243C3 /* GameScene.swift */,
+				A72C2B282C64ECB15C0800E5 /* LevelDefinition.swift */,
+				3C01CD6AC6453E7FFBE06877 /* LoveRunScene.swift */,
 				012A580C0C94C39B70BD30B5 /* PlayerNode.swift */,
 			);
 			path = Game;
@@ -154,11 +160,11 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					31119C3701DB4A3768E99198 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = 7VNK3YLV96;
 						ProvisioningStyle = Automatic;
 					};
 					36C23D7122CF5417BDC331CB = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = 7VNK3YLV96;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -203,7 +209,9 @@
 				0E2B816994E1190D3DB2DEF6 /* GameRules.swift in Sources */,
 				093676B9DE5FC18A635D67FC /* GameScene.swift in Sources */,
 				9BBAFCB93C48C50492D32560 /* GameView.swift in Sources */,
+				B2C2BF2E4F1D6D094DE32B09 /* LevelDefinition.swift in Sources */,
 				0A3100F66F35F2BC67C8426B /* LoveRunApp.swift in Sources */,
+				5C0CAA3CF1D7F7B4A4EE3C78 /* LoveRunScene.swift in Sources */,
 				780BE85AE6CBFB3F8E89C8B7 /* PlayerNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

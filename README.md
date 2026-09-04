@@ -4,14 +4,14 @@ A cheerful heart-catching game available as a native iPhone/iPad app and as the 
 
 ## Native iOS Game
 
-The `LoveRun.xcodeproj` app is built with SwiftUI and SpriteKit. It features a custom six-frame animated blonde runner with cat-eye glasses, landscape multi-touch controls, time-based movement and jumping, heart particles, progressive difficulty, win/game-over states, and a saved high score.
+The `LoveRun.xcodeproj` app is built with SwiftUI and SpriteKit. It features a custom six-frame animated blonde runner with cat-eye glasses, three illustrated landscape worlds, authored platform routes, hazards and bounce flowers, heart combos, golden hearts, hidden love letters, three puppy rescues, haptic feedback, win/game-over states, and a saved high score.
 
 ### How to Play on iPhone or iPad
 
 1. Tap anywhere to start.
 2. Hold the left or right control to run.
-3. Tap **JUMP** while moving to catch hearts.
-4. Collect 20 hearts before three get away.
+3. Tap **JUMP** while moving to reach upper routes and avoid hazards.
+4. Build combos, collect special items, and rescue a puppy at the end of each level.
 
 The project targets iOS 17 and supports landscape orientation on iPhone and iPad.
 

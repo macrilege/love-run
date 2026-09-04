@@ -2,8 +2,8 @@ import SpriteKit
 import SwiftUI
 
 struct GameView: View {
-    private let scene: GameScene = {
-        let scene = GameScene(size: CGSize(width: 844, height: 390))
+    private let scene: LoveRunScene = {
+        let scene = LoveRunScene(size: CGSize(width: 844, height: 390))
         scene.scaleMode = .aspectFill
         return scene
     }()
@@ -15,4 +15,3 @@ struct GameView: View {
             .statusBarHidden()
     }
 }
-
