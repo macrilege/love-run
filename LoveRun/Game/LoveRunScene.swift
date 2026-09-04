@@ -94,6 +94,14 @@ final class LoveRunScene: SKScene {
                 player.position.x = level.puppies[0].position.x - 105
                 cameraNode.position.x = player.position.x
             }
+            if let rawPlatform = ProcessInfo.processInfo.environment["LOVE_RUN_START_PLATFORM_INDEX"],
+               let platformIndex = Int(rawPlatform),
+               level.platforms.indices.contains(platformIndex) {
+                let platform = level.platforms[platformIndex]
+                player.position = CGPoint(x: platform.rect.midX, y: platform.rect.maxY)
+                player.standStill(facing: 1)
+                cameraNode.position.x = max(size.width / 2, player.position.x)
+            }
         }
     }
 
@@ -221,7 +229,15 @@ final class LoveRunScene: SKScene {
         let platform = SKSpriteNode(texture: texture)
         platform.anchorPoint = CGPoint(x: 0.5, y: 0.78)
         platform.size = CGSize(width: spec.rect.width + 14, height: spec.style == .cloud ? 66 : 58)
-        platform.position.y = spec.rect.height / 2 + 4
+        // Each atlas cell has different transparent padding above its painted surface.
+        // These offsets put the visible top exactly at the collision rect's maxY.
+        let artworkOffset: CGFloat
+        switch spec.style {
+        case .stone: artworkOffset = 20
+        case .picnic: artworkOffset = -3
+        case .cloud: artworkOffset = -4
+        }
+        platform.position.y = spec.rect.height / 2 + artworkOffset
         root.addChild(platform)
         if spec.behavior != .fixed {
             let badge = SKLabelNode(fontNamed: "AvenirNext-Heavy")
