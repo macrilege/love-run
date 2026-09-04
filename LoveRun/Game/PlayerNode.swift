@@ -7,9 +7,10 @@ final class PlayerNode: SKNode {
     private let runTextures: [SKTexture]
     private let sparkles = SKNode()
     private var isRunningAnimationActive = false
+    private var animationClock: CGFloat = 0
 
     override init() {
-        let sheet = SKTexture(imageNamed: "BlondeRunner")
+        let sheet = SKTexture(imageNamed: "BlondeRunnerSmooth")
         let cells = [
             CGRect(x: 0, y: 0.5, width: 1.0 / 3.0, height: 0.5),
             CGRect(x: 1.0 / 3.0, y: 0.5, width: 1.0 / 3.0, height: 0.5),
@@ -28,8 +29,8 @@ final class PlayerNode: SKNode {
 
         runner.texture = runTextures[0]
         runner.anchorPoint = CGPoint(x: 0.5, y: 0)
-        runner.size = CGSize(width: 132, height: 127)
-        runner.position = CGPoint(x: 0, y: -17)
+        runner.size = CGSize(width: 134, height: 134)
+        runner.position = CGPoint(x: 0, y: -4)
         addChild(runner)
 
         sparkles.zPosition = 2
@@ -66,28 +67,30 @@ final class PlayerNode: SKNode {
     func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat) {
         xScale = facing
         if moving && !airborne {
+            animationClock += deltaTime
             if !isRunningAnimationActive {
-                runner.run(.repeatForever(.animate(with: runTextures, timePerFrame: 0.085, resize: false, restore: false)), withKey: "runCycle")
+                runner.run(.repeatForever(.animate(with: runTextures, timePerFrame: 0.07, resize: false, restore: false)), withKey: "runCycle")
                 isRunningAnimationActive = true
             }
-            runner.position.y = -17
+            runner.position.y = -4 + sin(animationClock / 0.42 * .pi * 2) * 0.8
             runner.zRotation = 0
         } else {
             if isRunningAnimationActive {
                 runner.removeAction(forKey: "runCycle")
                 isRunningAnimationActive = false
             }
-            runner.texture = airborne ? runTextures[5] : runTextures[0]
-            runner.position.y = airborne ? -13 : -17
+            animationClock = 0
+            runner.texture = airborne ? runTextures[2] : runTextures[0]
+            runner.position.y = airborne ? 0 : -4
             runner.zRotation = airborne ? -0.04 : 0
         }
     }
 
     func squashForLanding() {
-        removeAction(forKey: "landing")
-        run(.sequence([
-            .scaleX(to: xScale * 1.08, y: 0.88, duration: 0.06),
-            .scaleX(to: xScale.sign == .minus ? -1 : 1, y: 1, duration: 0.09)
+        runner.removeAction(forKey: "landing")
+        runner.run(.sequence([
+            .scaleX(to: 1.06, y: 0.91, duration: 0.055),
+            .scale(to: 1, duration: 0.085)
         ]), withKey: "landing")
     }
 
