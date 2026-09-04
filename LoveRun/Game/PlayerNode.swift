@@ -49,6 +49,14 @@ final class PlayerNode: SKNode {
         super.init()
         zPosition = 20
 
+        let groundShadow = SKShapeNode(ellipseOf: CGSize(width: 58, height: 13))
+        groundShadow.fillColor = UIColor(red: 0.08, green: 0, blue: 0.12, alpha: 0.62)
+        groundShadow.strokeColor = UIColor(red: 1, green: 0.25, blue: 0.62, alpha: 0.22)
+        groundShadow.glowWidth = 5
+        groundShadow.position = CGPoint(x: 0, y: 2)
+        groundShadow.zPosition = -2
+        addChild(groundShadow)
+
         runner.texture = runTextures[0]
         runner.anchorPoint = CGPoint(x: 0.5, y: 0)
         runner.size = runningSize

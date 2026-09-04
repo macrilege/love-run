@@ -57,6 +57,7 @@ final class LoveRunScene: SKScene {
     private let healthHUD = SKNode()
     private let levelLabel = SKLabelNode(fontNamed: "AvenirNext-Heavy")
     private let comboLabel = SKLabelNode(fontNamed: "AvenirNext-Heavy")
+    private let comboPlate = SKShapeNode(rectOf: CGSize(width: 108, height: 31), cornerRadius: 15)
     private let puppyLabel = SKLabelNode(fontNamed: "AvenirNext-DemiBold")
     private let loveFrame = SKSpriteNode()
     private let loveFill = SKSpriteNode()
@@ -126,6 +127,8 @@ final class LoveRunScene: SKScene {
         heldTouches.removeAll()
         backdrop.texture = SKTexture(imageNamed: level.backgroundAsset)
         backdrop.texture?.filteringMode = .linear
+        backdrop.color = UIColor(red: 0.08, green: 0.01, blue: 0.13, alpha: 1)
+        backdrop.colorBlendFactor = 0.16
         buildGround()
         buildPetals()
         level.platforms.forEach(buildPlatform)
@@ -222,11 +225,20 @@ final class LoveRunScene: SKScene {
         platform.anchorPoint = CGPoint(x: 0.5, y: 0.78)
         platform.size = CGSize(width: spec.rect.width + 14, height: spec.style == .cloud ? 66 : 58)
         platform.position.y = spec.rect.height / 2 + 4
+        let shadow = SKSpriteNode(texture: texture)
+        shadow.anchorPoint = platform.anchorPoint
+        shadow.size = platform.size
+        shadow.position = CGPoint(x: 4, y: platform.position.y - 6)
+        shadow.color = UIColor(red: 0.08, green: 0, blue: 0.12, alpha: 1)
+        shadow.colorBlendFactor = 1
+        shadow.alpha = 0.48
+        shadow.zPosition = -1
+        root.addChild(shadow)
         root.addChild(platform)
         if spec.behavior != .fixed {
             let badge = SKLabelNode(fontNamed: "AvenirNext-Heavy")
-            badge.text = spec.behavior == .moving ? "↔" : "✦"
-            badge.fontSize = 18
+            badge.text = spec.behavior == .moving ? "MOVING" : "FRAGILE"
+            badge.fontSize = 9
             badge.fontColor = spec.behavior == .moving ? .cyan : .yellow
             badge.position.y = 17
             root.addChild(badge)
@@ -288,6 +300,13 @@ final class LoveRunScene: SKScene {
         node.name = spec.style.rawValue
         node.position = spec.position
         node.zPosition = 28
+        let contrastHalo = SKShapeNode(circleOfRadius: node.size.width * 0.42)
+        contrastHalo.fillColor = UIColor(red: 0.11, green: 0.01, blue: 0.17, alpha: 0.55)
+        contrastHalo.strokeColor = UIColor(red: 1, green: 0.78, blue: 0.18, alpha: 0.45)
+        contrastHalo.lineWidth = 2
+        contrastHalo.glowWidth = 5
+        contrastHalo.zPosition = -1
+        node.addChild(contrastHalo)
         node.run(.repeatForever(.sequence([.moveBy(x: 0, y: 7, duration: 0.55), .moveBy(x: 0, y: -7, duration: 0.55)])))
         world.addChild(node)
         pickups.append(node)
@@ -318,6 +337,14 @@ final class LoveRunScene: SKScene {
             label.fontColor = .yellow
             label.position = CGPoint(x: spec.position.x, y: 164)
             label.zPosition = 30
+            let labelPlate = SKShapeNode(rectOf: CGSize(width: 154, height: 25), cornerRadius: 12)
+            labelPlate.fillColor = UIColor(red: 0.10, green: 0.01, blue: 0.16, alpha: 0.82)
+            labelPlate.strokeColor = UIColor(red: 1, green: 0.72, blue: 0.18, alpha: 0.7)
+            labelPlate.lineWidth = 1.5
+            labelPlate.position = CGPoint(x: spec.position.x, y: 169)
+            labelPlate.zPosition = 29
+            labelPlate.name = "puppyLabelPlate\(index)"
+            world.addChild(labelPlate)
             world.addChild(label)
         }
     }
@@ -336,6 +363,15 @@ final class LoveRunScene: SKScene {
     }
 
     private func buildHUD() {
+        addHUDPlate(size: CGSize(width: 154, height: 64), position: CGPoint(x: -333, y: 145))
+        addHUDPlate(size: CGSize(width: 132, height: 34), position: CGPoint(x: 337, y: 157))
+        comboPlate.fillColor = UIColor(red: 0.09, green: 0.005, blue: 0.15, alpha: 0.8)
+        comboPlate.strokeColor = UIColor(red: 1, green: 0.69, blue: 0.15, alpha: 0.72)
+        comboPlate.lineWidth = 1.5
+        comboPlate.position = CGPoint(x: 211, y: 137)
+        comboPlate.zPosition = 101
+        comboPlate.isHidden = true
+        hud.addChild(comboPlate)
         scoreLabel.fontSize = 21
         scoreLabel.horizontalAlignmentMode = .left
         scoreLabel.position = CGPoint(x: -394, y: 157)
@@ -350,13 +386,15 @@ final class LoveRunScene: SKScene {
         }
         hud.addChild(healthHUD)
         levelLabel.fontSize = 14
-        levelLabel.position = CGPoint(x: 0, y: 165)
+        levelLabel.verticalAlignmentMode = .center
+        levelLabel.position = CGPoint(x: 0, y: 139)
         comboLabel.fontSize = 16
         comboLabel.fontColor = .yellow
-        comboLabel.position = CGPoint(x: 276, y: 146)
+        comboLabel.position = CGPoint(x: 211, y: 146)
         puppyLabel.fontSize = 14
         puppyLabel.horizontalAlignmentMode = .right
-        puppyLabel.position = CGPoint(x: 394, y: 165)
+        puppyLabel.verticalAlignmentMode = .center
+        puppyLabel.position = CGPoint(x: 394, y: 157)
         [scoreLabel, levelLabel, comboLabel, puppyLabel].forEach { $0.zPosition = 105; hud.addChild($0) }
         loveFrame.texture = Self.meterTexture(cell: 0)
         loveFrame.size = CGSize(width: 278, height: 62)
@@ -378,6 +416,16 @@ final class LoveRunScene: SKScene {
         configure(leftButton, at: CGPoint(x: -352, y: -132), size: CGSize(width: 82, height: 82))
         configure(rightButton, at: CGPoint(x: -264, y: -132), size: CGSize(width: 82, height: 82))
         configure(jumpButton, at: CGPoint(x: 342, y: -128), size: CGSize(width: 136, height: 99))
+    }
+
+    private func addHUDPlate(size: CGSize, position: CGPoint) {
+        let plate = SKShapeNode(rectOf: size, cornerRadius: min(size.height / 2, 17))
+        plate.fillColor = UIColor(red: 0.09, green: 0.005, blue: 0.15, alpha: 0.8)
+        plate.strokeColor = UIColor(red: 1, green: 0.69, blue: 0.15, alpha: 0.72)
+        plate.lineWidth = 1.5
+        plate.position = position
+        plate.zPosition = 101
+        hud.addChild(plate)
     }
 
     private func configure(_ button: SKSpriteNode, at position: CGPoint, size: CGSize) {
@@ -580,6 +628,7 @@ final class LoveRunScene: SKScene {
         burst(at: CGPoint(x: puppy.position.x, y: puppy.position.y + 80), colors: [.systemPink, .yellow, .white], count: 30)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         world.childNode(withName: "puppyLabel\(index)")?.removeFromParent()
+        world.childNode(withName: "puppyLabelPlate\(index)")?.removeFromParent()
         puppy.removeAllActions()
         puppy.run(.sequence([
             .group([.move(to: CGPoint(x: player.position.x + 58 * facing, y: player.position.y + 5), duration: 0.45), .scale(to: 1.2, duration: 0.45)]),
@@ -649,8 +698,10 @@ final class LoveRunScene: SKScene {
         for index in 0..<3 {
             healthHUD.childNode(withName: "healthHeart\(index)")?.isHidden = index >= health
         }
-        levelLabel.text = "LEVEL \(levelIndex + 1)  •  \(level.name)"
+        levelLabel.fontSize = level.name.count > 18 ? 11 : 13
+        levelLabel.text = "WORLD \(levelIndex + 1)  •  \(level.name)"
         comboLabel.text = combo > 1 ? "×\(combo) COMBO" : ""
+        comboPlate.isHidden = combo <= 1
         puppyLabel.text = "PUPPIES \(rescued)/12"
         loveFillMask.xScale = max(0.015, min(1, CGFloat(love) / CGFloat(totalLove)))
     }
@@ -661,6 +712,7 @@ final class LoveRunScene: SKScene {
         frame.size = CGSize(width: 520, height: 265)
         frame.zPosition = 190
         messages.addChild(frame)
+        addMessagePlate(size: CGSize(width: 410, height: 112), position: .zero, zPosition: 191)
         let eyebrow = SKLabelNode(fontNamed: "AvenirNext-Heavy")
         eyebrow.text = "WORLD \(levelIndex + 1) • READY"
         eyebrow.fontSize = 18
@@ -689,6 +741,15 @@ final class LoveRunScene: SKScene {
 
     private func showCountdown(_ text: String, color: UIColor) {
         messages.removeAllChildren()
+        let shadow = SKLabelNode(fontNamed: "AvenirNext-Heavy")
+        shadow.text = text
+        shadow.fontSize = 82
+        shadow.fontColor = UIColor(red: 0.08, green: 0, blue: 0.13, alpha: 0.9)
+        shadow.verticalAlignmentMode = .center
+        shadow.position = CGPoint(x: 4, y: -4)
+        shadow.zPosition = 249
+        shadow.setScale(0.35)
+        messages.addChild(shadow)
         let label = SKLabelNode(fontNamed: "AvenirNext-Heavy")
         label.text = text
         label.fontSize = 82
@@ -697,6 +758,7 @@ final class LoveRunScene: SKScene {
         label.zPosition = 250
         label.setScale(0.35)
         messages.addChild(label)
+        shadow.run(.group([.scale(to: 1.2, duration: 0.22), .fadeOut(withDuration: 0.42)]))
         label.run(.group([.scale(to: 1.2, duration: 0.22), .fadeOut(withDuration: 0.42)]))
     }
 
@@ -713,6 +775,7 @@ final class LoveRunScene: SKScene {
         frame.setScale(0.4)
         messages.addChild(frame)
         frame.run(.sequence([.scale(to: 1.08, duration: 0.22), .scale(to: 1, duration: 0.12)]))
+        addMessagePlate(size: CGSize(width: 430, height: 104), position: CGPoint(x: 0, y: 1), zPosition: 201)
         let heading = SKLabelNode(fontNamed: "AvenirNext-Heavy")
         heading.text = "\(name.uppercased()) RESCUED!"
         heading.fontSize = 36
@@ -731,6 +794,16 @@ final class LoveRunScene: SKScene {
             .moveBy(x: -9, y: 4, duration: 0.05), .moveBy(x: 17, y: -8, duration: 0.05),
             .moveBy(x: -12, y: 6, duration: 0.05), .moveBy(x: 4, y: -2, duration: 0.05)
         ]))
+    }
+
+    private func addMessagePlate(size: CGSize, position: CGPoint, zPosition: CGFloat) {
+        let plate = SKShapeNode(rectOf: size, cornerRadius: 24)
+        plate.fillColor = UIColor(red: 0.09, green: 0.005, blue: 0.15, alpha: 0.86)
+        plate.strokeColor = UIColor(red: 1, green: 0.73, blue: 0.16, alpha: 0.85)
+        plate.lineWidth = 2
+        plate.position = position
+        plate.zPosition = zPosition
+        messages.addChild(plate)
     }
 
     private func showFinalParade() {
