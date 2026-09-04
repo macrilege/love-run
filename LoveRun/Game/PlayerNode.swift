@@ -13,7 +13,7 @@ final class PlayerNode: SKNode {
     private var animationClock: CGFloat = 0
 
     private let runningSize = CGSize(width: 134, height: 134)
-    private let idleSize = CGSize(width: 100, height: 134)
+    private let idleSize = CGSize(width: 62, height: 134)
 
     override init() {
         let sheet = SKTexture(imageNamed: "BlondeRunnerSmooth")
@@ -32,11 +32,16 @@ final class PlayerNode: SKNode {
         }
 
         let idleSheet = SKTexture(imageNamed: "BlondeRunnerIdle")
-        idleTextures = (0..<4).map { index in
-            let texture = SKTexture(
-                rect: CGRect(x: CGFloat(index) / 4, y: 0, width: 1.0 / 4.0, height: 1),
-                in: idleSheet
-            )
+        // The generated poses are not centered identically inside their four atlas cells.
+        // Crop each around the planted foot/body axis so the idle cycle breathes without drifting.
+        let idleRects = [
+            CGRect(x: 0.0866, y: 0.03, width: 0.1427, height: 0.94),
+            CGRect(x: 0.3218, y: 0.03, width: 0.1427, height: 0.94),
+            CGRect(x: 0.5585, y: 0.03, width: 0.1427, height: 0.94),
+            CGRect(x: 0.7827, y: 0.03, width: 0.1427, height: 0.94)
+        ]
+        idleTextures = idleRects.map { rect in
+            let texture = SKTexture(rect: rect, in: idleSheet)
             texture.filteringMode = .linear
             return texture
         }

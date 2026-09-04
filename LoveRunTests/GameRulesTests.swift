@@ -2,15 +2,17 @@ import XCTest
 @testable import LoveRun
 
 final class GameRulesTests: XCTestCase {
-    func testCampaignHasThreeDistinctPuppyLevels() {
-        XCTAssertEqual(LevelDefinition.all.count, 3)
-        XCTAssertEqual(Set(LevelDefinition.all.map(\.puppyName)).count, 3)
-        XCTAssertEqual(Set(LevelDefinition.all.map(\.backgroundAsset)).count, 3)
+    func testCampaignHasSixDistinctWorldsAndTwelvePuppies() {
+        XCTAssertEqual(LevelDefinition.all.count, 6)
+        XCTAssertEqual(Set(LevelDefinition.all.flatMap(\.puppies).map(\.name)).count, 12)
+        XCTAssertEqual(Set(LevelDefinition.all.flatMap(\.puppies).map(\.frame)).count, 12)
+        XCTAssertEqual(Set(LevelDefinition.all.map(\.backgroundAsset)).count, 6)
         for level in LevelDefinition.all {
             XCTAssertGreaterThanOrEqual(level.platforms.count, 8)
             XCTAssertGreaterThanOrEqual(level.hazards.count, 4)
             XCTAssertGreaterThanOrEqual(level.pickups.count, 22)
-            XCTAssertLessThan(level.puppyPosition.x, level.worldWidth)
+            XCTAssertEqual(level.puppies.count, 2)
+            XCTAssertTrue(level.puppies.allSatisfy { $0.position.x < level.worldWidth })
         }
     }
 
