@@ -41,6 +41,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.macrilege.LoveRunTests
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   LoveRun:
     build:

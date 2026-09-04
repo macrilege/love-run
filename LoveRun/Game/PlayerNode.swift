@@ -5,9 +5,14 @@ final class PlayerNode: SKNode {
 
     private let runner = SKSpriteNode()
     private let runTextures: [SKTexture]
+    private let idleTextures: [SKTexture]
     private let sparkles = SKNode()
     private var isRunningAnimationActive = false
+    private var isIdleAnimationActive = false
     private var animationClock: CGFloat = 0
+
+    private let runningSize = CGSize(width: 134, height: 134)
+    private let idleSize = CGSize(width: 100, height: 134)
 
     override init() {
         let sheet = SKTexture(imageNamed: "BlondeRunnerSmooth")
@@ -24,12 +29,22 @@ final class PlayerNode: SKNode {
             texture.filteringMode = .linear
             return texture
         }
+
+        let idleSheet = SKTexture(imageNamed: "BlondeRunnerIdle")
+        idleTextures = (0..<4).map { index in
+            let texture = SKTexture(
+                rect: CGRect(x: CGFloat(index) / 4, y: 0, width: 1.0 / 4.0, height: 1),
+                in: idleSheet
+            )
+            texture.filteringMode = .linear
+            return texture
+        }
         super.init()
         zPosition = 20
 
         runner.texture = runTextures[0]
         runner.anchorPoint = CGPoint(x: 0.5, y: 0)
-        runner.size = CGSize(width: 134, height: 134)
+        runner.size = runningSize
         runner.position = CGPoint(x: 0, y: -4)
         addChild(runner)
 
@@ -68,22 +83,49 @@ final class PlayerNode: SKNode {
         xScale = facing
         if moving && !airborne {
             animationClock += deltaTime
+            stopIdleAnimation()
             if !isRunningAnimationActive {
+                runner.size = runningSize
                 runner.run(.repeatForever(.animate(with: runTextures, timePerFrame: 0.07, resize: false, restore: false)), withKey: "runCycle")
                 isRunningAnimationActive = true
             }
             runner.position.y = -4 + sin(animationClock / 0.42 * .pi * 2) * 0.8
             runner.zRotation = 0
         } else {
-            if isRunningAnimationActive {
-                runner.removeAction(forKey: "runCycle")
-                isRunningAnimationActive = false
-            }
+            stopRunningAnimation()
             animationClock = 0
-            runner.texture = airborne ? runTextures[2] : runTextures[0]
-            runner.position.y = airborne ? 0 : -4
-            runner.zRotation = airborne ? -0.04 : 0
+            if airborne {
+                stopIdleAnimation()
+                runner.texture = runTextures[2]
+                runner.size = runningSize
+                runner.position.y = 0
+                runner.zRotation = -0.04
+            } else {
+                runner.position.y = -4
+                runner.zRotation = 0
+                if !isIdleAnimationActive {
+                    runner.texture = idleTextures[0]
+                    runner.size = idleSize
+                    runner.run(
+                        .repeatForever(.animate(with: idleTextures, timePerFrame: 0.22, resize: false, restore: false)),
+                        withKey: "idleCycle"
+                    )
+                    isIdleAnimationActive = true
+                }
+            }
         }
+    }
+
+    private func stopRunningAnimation() {
+        guard isRunningAnimationActive else { return }
+        runner.removeAction(forKey: "runCycle")
+        isRunningAnimationActive = false
+    }
+
+    private func stopIdleAnimation() {
+        guard isIdleAnimationActive else { return }
+        runner.removeAction(forKey: "idleCycle")
+        isIdleAnimationActive = false
     }
 
     func squashForLanding() {
