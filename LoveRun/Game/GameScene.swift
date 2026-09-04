@@ -354,7 +354,7 @@ final class GameScene: SKScene {
             grounded = false
         }
 
-        player.updateAnimation(deltaTime: dt, moving: velocity.dx != 0, airborne: !grounded, facing: facing)
+        player.updateAnimation(deltaTime: dt, moving: velocity.dx != 0, airborne: !grounded, facing: facing, verticalVelocity: velocity.dy)
     }
 
     private func updateCamera() {

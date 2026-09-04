@@ -6,6 +6,7 @@ final class PlayerNode: SKNode {
     private let runner = SKSpriteNode()
     private let runTextures: [SKTexture]
     private let idleTextures: [SKTexture]
+    private let jumpTextures: [SKTexture]
     private let sparkles = SKNode()
     private var isRunningAnimationActive = false
     private var isIdleAnimationActive = false
@@ -35,6 +36,16 @@ final class PlayerNode: SKNode {
             let texture = SKTexture(
                 rect: CGRect(x: CGFloat(index) / 4, y: 0, width: 1.0 / 4.0, height: 1),
                 in: idleSheet
+            )
+            texture.filteringMode = .linear
+            return texture
+        }
+
+        let jumpSheet = SKTexture(imageNamed: "BlondeRunnerJump")
+        jumpTextures = (0..<4).map { index in
+            let texture = SKTexture(
+                rect: CGRect(x: CGFloat(index) / 4 + 0.0125, y: 0.14, width: 0.225, height: 0.78),
+                in: jumpSheet
             )
             texture.filteringMode = .linear
             return texture
@@ -79,7 +90,7 @@ final class PlayerNode: SKNode {
         }
     }
 
-    func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat) {
+    func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat, verticalVelocity: CGFloat = 0) {
         xScale = facing
         if moving && !airborne {
             animationClock += deltaTime
@@ -96,10 +107,15 @@ final class PlayerNode: SKNode {
             animationClock = 0
             if airborne {
                 stopIdleAnimation()
-                runner.texture = runTextures[2]
+                let frame: Int
+                if verticalVelocity > 430 { frame = 0 }
+                else if verticalVelocity > 120 { frame = 1 }
+                else if verticalVelocity > -180 { frame = 2 }
+                else { frame = 3 }
+                runner.texture = jumpTextures[frame]
                 runner.size = runningSize
                 runner.position.y = 0
-                runner.zRotation = -0.04
+                runner.zRotation = 0
             } else {
                 runner.position.y = -4
                 runner.zRotation = 0

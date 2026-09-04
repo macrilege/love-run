@@ -36,11 +36,14 @@ final class LoveRunScene: SKScene {
     private var level: LevelDefinition { LevelDefinition.all[levelIndex] }
 
     private let scoreLabel = SKLabelNode(fontNamed: "AvenirNext-Heavy")
-    private let healthLabel = SKLabelNode(fontNamed: "AvenirNext-Heavy")
+    private let healthHUD = SKNode()
     private let levelLabel = SKLabelNode(fontNamed: "AvenirNext-Heavy")
     private let comboLabel = SKLabelNode(fontNamed: "AvenirNext-Heavy")
     private let puppyLabel = SKLabelNode(fontNamed: "AvenirNext-DemiBold")
-    private let loveFill = SKSpriteNode(color: UIColor(red: 1, green: 0.08, blue: 0.52, alpha: 1), size: CGSize(width: 216, height: 12))
+    private let loveFrame = SKSpriteNode()
+    private let loveFill = SKSpriteNode()
+    private let loveFillMask = SKSpriteNode(color: .white, size: CGSize(width: 190, height: 34))
+    private let loveFillCrop = SKCropNode()
     private let leftButton = SKShapeNode(circleOfRadius: 34)
     private let rightButton = SKShapeNode(circleOfRadius: 34)
     private let jumpButton = SKShapeNode(circleOfRadius: 42)
@@ -173,38 +176,18 @@ final class LoveRunScene: SKScene {
         let root = SKNode()
         root.position = CGPoint(x: spec.rect.midX, y: spec.rect.midY)
         root.zPosition = 11
-        let shadow = SKShapeNode(rectOf: CGSize(width: spec.rect.width + 8, height: spec.rect.height + 9), cornerRadius: 10)
-        shadow.fillColor = UIColor(red: 0.08, green: 0, blue: 0.12, alpha: 0.5)
-        shadow.strokeColor = .clear
-        shadow.position.y = -6
-        root.addChild(shadow)
-        if spec.style == .cloud {
-            for x in stride(from: -spec.rect.width / 2 + 15, through: spec.rect.width / 2 - 10, by: 25) {
-                let puff = SKShapeNode(circleOfRadius: 19)
-                puff.fillColor = UIColor(red: 1, green: 0.70, blue: 0.90, alpha: 0.97)
-                puff.strokeColor = .white
-                puff.lineWidth = 2
-                puff.position.x = x
-                root.addChild(puff)
-            }
-        } else {
-            let body = SKShapeNode(rectOf: spec.rect.size, cornerRadius: 9)
-            body.fillColor = spec.style == .picnic ? UIColor(red: 0.96, green: 0.10, blue: 0.48, alpha: 1) : UIColor(red: 0.46, green: 0.12, blue: 0.48, alpha: 1)
-            body.strokeColor = UIColor(red: 1, green: 0.76, blue: 0.16, alpha: 1)
-            body.lineWidth = 3
-            root.addChild(body)
-            for x in stride(from: -spec.rect.width / 2 + 15, through: spec.rect.width / 2 - 10, by: 26) {
-                let jewel = SKShapeNode(circleOfRadius: 4)
-                jewel.fillColor = spec.style == .picnic ? .white : UIColor(red: 1, green: 0.20, blue: 0.64, alpha: 1)
-                jewel.strokeColor = .clear
-                jewel.position.x = x
-                root.addChild(jewel)
-            }
+        let cell: (Int, Int)
+        switch spec.style {
+        case .stone: cell = (3, 1)
+        case .picnic: cell = (0, 2)
+        case .cloud: cell = (1, 2)
         }
-        let lip = SKSpriteNode(color: UIColor(red: 1, green: 0.20, blue: 0.61, alpha: 1), size: CGSize(width: spec.rect.width - 7, height: 5))
-        lip.position.y = spec.rect.height / 2
-        lip.zPosition = 4
-        root.addChild(lip)
+        let texture = Self.objectTexture(column: cell.0, row: cell.1, crop: CGRect(x: 0.02, y: 0.18, width: 0.96, height: 0.62))
+        let platform = SKSpriteNode(texture: texture)
+        platform.anchorPoint = CGPoint(x: 0.5, y: 0.78)
+        platform.size = CGSize(width: spec.rect.width + 14, height: spec.style == .cloud ? 66 : 58)
+        platform.position.y = spec.rect.height / 2 + 4
+        root.addChild(platform)
         world.addChild(root)
     }
 
@@ -212,37 +195,24 @@ final class LoveRunScene: SKScene {
         let root = SKNode()
         root.position = CGPoint(x: spec.rect.midX, y: spec.rect.midY)
         root.zPosition = 15
+        let cell: (Int, Int)
+        let displaySize: CGSize
         switch spec.style {
         case .puddle:
-            let shape = SKShapeNode(ellipseOf: spec.rect.size)
-            shape.fillColor = UIColor(red: 0.43, green: 0.15, blue: 0.90, alpha: 0.88)
-            shape.strokeColor = UIColor(red: 0.96, green: 0.71, blue: 1, alpha: 1)
-            shape.lineWidth = 2
-            root.addChild(shape)
+            cell = (0, 1)
+            displaySize = CGSize(width: spec.rect.width + 24, height: 42)
         case .hedge:
-            let shape = SKShapeNode(rectOf: spec.rect.size, cornerRadius: 13)
-            shape.fillColor = UIColor(red: 0.07, green: 0.38, blue: 0.20, alpha: 1)
-            shape.strokeColor = UIColor(red: 1, green: 0.20, blue: 0.58, alpha: 1)
-            shape.lineWidth = 3
-            root.addChild(shape)
-            for x in [-20.0, 0, 20.0] {
-                let rose = SKShapeNode(circleOfRadius: 6)
-                rose.fillColor = UIColor(red: 1, green: 0.05, blue: 0.45, alpha: 1)
-                rose.strokeColor = UIColor(red: 1, green: 0.75, blue: 0.16, alpha: 1)
-                rose.position.x = x
-                root.addChild(rose)
-            }
+            cell = (1, 1)
+            displaySize = CGSize(width: spec.rect.width + 24, height: spec.rect.height + 34)
         case .thorns:
-            let vine = SKSpriteNode(color: UIColor(red: 0.14, green: 0.38, blue: 0.16, alpha: 1), size: CGSize(width: spec.rect.width, height: 6))
-            root.addChild(vine)
-            for x in stride(from: -spec.rect.width / 2 + 8, through: spec.rect.width / 2 - 6, by: 15) {
-                let thorn = SKShapeNode(path: triangle(width: 10, height: 17))
-                thorn.fillColor = UIColor(red: 1, green: 0.08, blue: 0.48, alpha: 1)
-                thorn.strokeColor = UIColor(red: 1, green: 0.76, blue: 0.16, alpha: 1)
-                thorn.position = CGPoint(x: x, y: 7)
-                root.addChild(thorn)
-            }
+            cell = (2, 1)
+            displaySize = CGSize(width: spec.rect.width + 28, height: 62)
         }
+        let hazard = SKSpriteNode(texture: Self.objectTexture(column: cell.0, row: cell.1))
+        hazard.anchorPoint = CGPoint(x: 0.5, y: 0)
+        hazard.size = displaySize
+        hazard.position.y = -spec.rect.height / 2
+        root.addChild(hazard)
         world.addChild(root)
     }
 
@@ -250,31 +220,27 @@ final class LoveRunScene: SKScene {
         let root = SKNode()
         root.position = point
         root.zPosition = 17
-        let stem = SKShapeNode(rectOf: CGSize(width: 8, height: 23), cornerRadius: 3)
-        stem.fillColor = UIColor(red: 0.51, green: 0.10, blue: 0.55, alpha: 1)
-        stem.strokeColor = UIColor(red: 1, green: 0.74, blue: 0.16, alpha: 1)
-        stem.position.y = 11
-        root.addChild(stem)
-        for index in 0..<10 {
-            let angle = CGFloat(index) / 10 * .pi * 2
-            let petal = SKShapeNode(ellipseOf: CGSize(width: 20, height: 9))
-            petal.fillColor = index.isMultiple(of: 2) ? .systemPink : UIColor(red: 1, green: 0.55, blue: 0.82, alpha: 1)
-            petal.strokeColor = .white
-            petal.position = CGPoint(x: cos(angle) * 15, y: 28 + sin(angle) * 7)
-            petal.zRotation = angle
-            root.addChild(petal)
-        }
-        let center = SKShapeNode(circleOfRadius: 8)
-        center.fillColor = .yellow
-        center.strokeColor = .white
-        center.position.y = 28
-        root.addChild(center)
+        let flower = SKSpriteNode(texture: Self.objectTexture(column: 3, row: 0))
+        flower.anchorPoint = CGPoint(x: 0.5, y: 0)
+        flower.size = CGSize(width: 82, height: 82)
+        root.addChild(flower)
         root.run(.repeatForever(.sequence([.scale(to: 1.08, duration: 0.45), .scale(to: 1, duration: 0.45)])))
         world.addChild(root)
     }
 
     private func buildPickup(_ spec: PickupSpec) {
-        let node = spec.style == .letter ? makeLetter() : makeHeart(golden: spec.style == .goldenHeart)
+        let node: SKSpriteNode
+        switch spec.style {
+        case .heart:
+            node = SKSpriteNode(texture: Self.objectTexture(column: 0, row: 0))
+            node.size = CGSize(width: 62, height: 62)
+        case .goldenHeart:
+            node = SKSpriteNode(texture: Self.objectTexture(column: 1, row: 0))
+            node.size = CGSize(width: 76, height: 76)
+        case .letter:
+            node = SKSpriteNode(texture: Self.objectTexture(column: 2, row: 0))
+            node.size = CGSize(width: 67, height: 58)
+        }
         node.name = spec.style.rawValue
         node.position = spec.position
         node.zPosition = 28
@@ -292,10 +258,8 @@ final class LoveRunScene: SKScene {
         node.size = CGSize(width: 88, height: 176)
         node.position = CGPoint(x: level.puppyPosition.x, y: groundY - 34)
         node.zPosition = 25
-        let aura = SKShapeNode(circleOfRadius: 47)
-        aura.fillColor = UIColor(red: 1, green: 0.15, blue: 0.58, alpha: 0.17)
-        aura.strokeColor = UIColor(red: 1, green: 0.76, blue: 0.16, alpha: 1)
-        aura.lineWidth = 3
+        let aura = SKSpriteNode(texture: Self.objectTexture(column: 2, row: 2))
+        aura.size = CGSize(width: 112, height: 112)
         aura.position.y = 75
         aura.zPosition = -1
         aura.run(.repeatForever(.sequence([.scale(to: 1.15, duration: 0.7), .scale(to: 0.94, duration: 0.7)])))
@@ -315,10 +279,16 @@ final class LoveRunScene: SKScene {
         scoreLabel.fontSize = 21
         scoreLabel.horizontalAlignmentMode = .left
         scoreLabel.position = CGPoint(x: -394, y: 157)
-        healthLabel.fontSize = 19
-        healthLabel.horizontalAlignmentMode = .left
-        healthLabel.fontColor = UIColor(red: 1, green: 0.21, blue: 0.62, alpha: 1)
-        healthLabel.position = CGPoint(x: -394, y: 129)
+        healthHUD.position = CGPoint(x: -375, y: 132)
+        healthHUD.zPosition = 105
+        for index in 0..<3 {
+            let heart = SKSpriteNode(texture: Self.objectTexture(column: 0, row: 0))
+            heart.name = "healthHeart\(index)"
+            heart.size = CGSize(width: 29, height: 29)
+            heart.position.x = CGFloat(index) * 30
+            healthHUD.addChild(heart)
+        }
+        hud.addChild(healthHUD)
         levelLabel.fontSize = 14
         levelLabel.position = CGPoint(x: 0, y: 165)
         comboLabel.fontSize = 16
@@ -327,18 +297,24 @@ final class LoveRunScene: SKScene {
         puppyLabel.fontSize = 14
         puppyLabel.horizontalAlignmentMode = .right
         puppyLabel.position = CGPoint(x: 394, y: 165)
-        [scoreLabel, healthLabel, levelLabel, comboLabel, puppyLabel].forEach { $0.zPosition = 105; hud.addChild($0) }
-        let track = SKShapeNode(rectOf: CGSize(width: 236, height: 24), cornerRadius: 12)
-        track.fillColor = UIColor(red: 0.17, green: 0.01, blue: 0.23, alpha: 0.86)
-        track.strokeColor = UIColor(red: 1, green: 0.76, blue: 0.16, alpha: 1)
-        track.lineWidth = 2.5
-        track.position = CGPoint(x: 0, y: 140)
-        track.zPosition = 102
-        hud.addChild(track)
+        [scoreLabel, levelLabel, comboLabel, puppyLabel].forEach { $0.zPosition = 105; hud.addChild($0) }
+        loveFrame.texture = Self.meterTexture(cell: 0)
+        loveFrame.size = CGSize(width: 278, height: 62)
+        loveFrame.position = CGPoint(x: 0, y: 139)
+        loveFrame.zPosition = 102
+        hud.addChild(loveFrame)
+        loveFill.texture = Self.meterTexture(cell: 1)
         loveFill.anchorPoint = CGPoint(x: 0, y: 0.5)
-        loveFill.position = CGPoint(x: -108, y: 140)
+        loveFill.size = CGSize(width: 190, height: 34)
+        loveFill.position = CGPoint(x: -78, y: 0)
         loveFill.zPosition = 104
-        hud.addChild(loveFill)
+        loveFillMask.anchorPoint = CGPoint(x: 0, y: 0.5)
+        loveFillMask.position = CGPoint(x: -78, y: 0)
+        loveFillCrop.position = CGPoint(x: 0, y: 139)
+        loveFillCrop.zPosition = 104
+        loveFillCrop.maskNode = loveFillMask
+        loveFillCrop.addChild(loveFill)
+        hud.addChild(loveFillCrop)
         configure(leftButton, text: "◀", at: CGPoint(x: -352, y: -137), font: 28)
         configure(rightButton, text: "▶", at: CGPoint(x: -270, y: -137), font: 28)
         configure(jumpButton, text: "JUMP", at: CGPoint(x: 348, y: -133), font: 14)
@@ -460,7 +436,7 @@ final class LoveRunScene: SKScene {
         }
         let hitbox = CGRect(x: player.position.x - 18, y: player.position.y, width: 36, height: 64)
         if player.position.y < -70 || (invincible == 0 && level.hazards.contains(where: { hitbox.intersects($0.rect) })) { takeDamage() }
-        player.updateAnimation(deltaTime: dt, moving: direction != 0, airborne: !grounded, facing: facing)
+        player.updateAnimation(deltaTime: dt, moving: direction != 0, airborne: !grounded, facing: facing, verticalVelocity: velocity.dy)
     }
 
     private func takeDamage() {
@@ -545,11 +521,13 @@ final class LoveRunScene: SKScene {
 
     private func updateHUD() {
         scoreLabel.text = "SCORE \(score)"
-        healthLabel.text = String(repeating: "♥ ", count: max(0, health))
+        for index in 0..<3 {
+            healthHUD.childNode(withName: "healthHeart\(index)")?.isHidden = index >= health
+        }
         levelLabel.text = "LEVEL \(levelIndex + 1)  •  \(level.name)"
         comboLabel.text = combo > 1 ? "×\(combo) COMBO" : ""
         puppyLabel.text = "PUPPIES \(rescued)/3"
-        loveFill.xScale = max(0.015, min(1, CGFloat(love) / CGFloat(totalLove)))
+        loveFillMask.xScale = max(0.015, min(1, CGFloat(love) / CGFloat(totalLove)))
     }
 
     private func showPanel(title: String, lines: [String], action: String) {
@@ -567,10 +545,8 @@ final class LoveRunScene: SKScene {
         panel.lineWidth = 3
         panel.zPosition = 200
         messages.addChild(panel)
-        let heart = SKLabelNode(fontNamed: "AvenirNext-Heavy")
-        heart.text = "♥"
-        heart.fontSize = 43
-        heart.fontColor = .systemPink
+        let heart = SKSpriteNode(texture: Self.objectTexture(column: 0, row: 0))
+        heart.size = CGSize(width: 58, height: 58)
         heart.position.y = 68
         heart.zPosition = 202
         messages.addChild(heart)
@@ -600,34 +576,31 @@ final class LoveRunScene: SKScene {
         messages.addChild(tap)
     }
 
-    private func makeHeart(golden: Bool) -> SKNode {
-        let path = CGMutablePath()
-        path.move(to: CGPoint(x: 0, y: -16))
-        path.addCurve(to: CGPoint(x: -27, y: 6), control1: CGPoint(x: -8, y: -5), control2: CGPoint(x: -27, y: -3))
-        path.addCurve(to: CGPoint(x: 0, y: 22), control1: CGPoint(x: -27, y: 24), control2: CGPoint(x: -8, y: 28))
-        path.addCurve(to: CGPoint(x: 27, y: 6), control1: CGPoint(x: 8, y: 28), control2: CGPoint(x: 27, y: 24))
-        path.addCurve(to: CGPoint(x: 0, y: -16), control1: CGPoint(x: 27, y: -3), control2: CGPoint(x: 8, y: -5))
-        path.closeSubpath()
-        let heart = SKShapeNode(path: path)
-        heart.fillColor = golden ? .yellow : UIColor(red: 1, green: 0.04, blue: 0.47, alpha: 1)
-        heart.strokeColor = .white
-        heart.lineWidth = golden ? 3 : 2
-        heart.glowWidth = golden ? 8 : 3
-        return heart
+    private static func objectTexture(column: Int, row: Int, crop: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1)) -> SKTexture {
+        let sheet = SKTexture(imageNamed: "RomanceObjects")
+        let cellWidth: CGFloat = 1 / 4
+        let cellHeight: CGFloat = 1 / 3
+        let texture = SKTexture(
+            rect: CGRect(
+                x: CGFloat(column) * cellWidth + crop.minX * cellWidth,
+                y: CGFloat(2 - row) * cellHeight + crop.minY * cellHeight,
+                width: crop.width * cellWidth,
+                height: crop.height * cellHeight
+            ),
+            in: sheet
+        )
+        texture.filteringMode = .linear
+        return texture
     }
 
-    private func makeLetter() -> SKNode {
-        let root = SKNode()
-        let envelope = SKShapeNode(rectOf: CGSize(width: 42, height: 29), cornerRadius: 4)
-        envelope.fillColor = UIColor(red: 1, green: 0.90, blue: 0.94, alpha: 1)
-        envelope.strokeColor = .yellow
-        envelope.lineWidth = 2.5
-        root.addChild(envelope)
-        let seal = SKShapeNode(circleOfRadius: 7)
-        seal.fillColor = .systemPink
-        seal.strokeColor = .white
-        root.addChild(seal)
-        return root
+    private static func meterTexture(cell: Int) -> SKTexture {
+        let sheet = SKTexture(imageNamed: "LoveMeter")
+        let texture = SKTexture(
+            rect: CGRect(x: CGFloat(cell) / 2 + 0.01, y: 0.36, width: 0.48, height: 0.28),
+            in: sheet
+        )
+        texture.filteringMode = .linear
+        return texture
     }
 
     private func burst(at position: CGPoint, colors: [UIColor], count: Int) {
@@ -644,12 +617,4 @@ final class LoveRunScene: SKScene {
         }
     }
 
-    private func triangle(width: CGFloat, height: CGFloat) -> CGPath {
-        let path = CGMutablePath()
-        path.move(to: CGPoint(x: -width / 2, y: -height / 2))
-        path.addLine(to: CGPoint(x: 0, y: height / 2))
-        path.addLine(to: CGPoint(x: width / 2, y: -height / 2))
-        path.closeSubpath()
-        return path
-    }
 }

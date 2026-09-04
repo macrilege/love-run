@@ -1,0 +1,13 @@
+{
+  "images" : [
+    {
+      "filename" : "blonde-runner-jump-purple.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
