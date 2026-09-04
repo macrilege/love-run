@@ -7,12 +7,6 @@ struct PlatformSpec {
     let rect: CGRect
     let style: PlatformStyle
     let behavior: PlatformBehavior
-
-    init(rect: CGRect, style: PlatformStyle, behavior: PlatformBehavior = .fixed) {
-        self.rect = rect
-        self.style = style
-        self.behavior = behavior
-    }
 }
 
 enum HazardStyle: CaseIterable { case puddle, hedge, thorns }
@@ -24,6 +18,7 @@ struct PuppySpec {
     let name: String
     let frame: Int
     let position: CGPoint
+    let requiredSeals: Int
 }
 
 struct LevelDefinition {
@@ -36,75 +31,103 @@ struct LevelDefinition {
     let hazards: [HazardSpec]
     let bouncePads: [CGPoint]
     let pickups: [PickupSpec]
+    let checkpoints: [CGFloat]
     let puppies: [PuppySpec]
 
     static let all: [LevelDefinition] = {
         let worlds: [(String, String, String, CGFloat)] = [
-            ("BLOOMING PARK", "Petals, platforms, and main-character energy.", "BloomingPark", 3_450),
-            ("SUNSET ROOFTOPS", "High standards. Higher jumps.", "SunsetRooftops", 3_600),
-            ("PARIS FASHION DISTRICT", "Couture courage on every corner.", "ParisFashionDistrict", 3_750),
-            ("CANDY BOARDWALK", "Sugar rush. Seaside sparkle.", "CandyBoardwalk", 3_900),
-            ("NEON MOON GARDEN", "Glow hard. Love harder.", "NeonMoonGarden", 4_050),
-            ("CRYSTAL HEART PALACE", "The royal rescue finale.", "CrystalHeartPalace", 4_200)
+            ("BLOOMING PARK", "Petals, platforms, and main-character energy.", "BloomingPark", 7_200),
+            ("SUNSET ROOFTOPS", "High standards. Higher jumps.", "SunsetRooftops", 7_500),
+            ("PARIS FASHION DISTRICT", "Couture courage on every corner.", "ParisFashionDistrict", 7_800),
+            ("CANDY BOARDWALK", "Sugar rush. Seaside sparkle.", "CandyBoardwalk", 8_100),
+            ("NEON MOON GARDEN", "Glow hard. Love harder.", "NeonMoonGarden", 8_400),
+            ("CRYSTAL HEART PALACE", "The royal rescue finale.", "CrystalHeartPalace", 8_700)
         ]
         let names = ["Honey", "Bijou", "Velvet", "Biscuit", "Pom-Pom", "Gigi", "Pearl", "Pixie", "Luna", "Trixie", "Angel", "Lucky"]
         return worlds.enumerated().map { index, world in
-            LevelDefinition(
+            let firstPuppyX = world.3 * 0.57
+            return LevelDefinition(
                 name: world.0,
                 tagline: world.1,
                 backgroundAsset: world.2,
                 worldWidth: world.3,
                 friendFrame: index % 4,
-                platforms: platformRoute(world: index),
-                hazards: hazardRoute(world: index),
-                bouncePads: [CGPoint(x: 350, y: 58), CGPoint(x: 1_485 + CGFloat(index * 24), y: 58), CGPoint(x: 2_680 + CGFloat(index * 38), y: 58)],
-                pickups: pickupRoute(offset: CGFloat(index * 34)),
+                platforms: platformRoute(world: index, width: world.3),
+                hazards: hazardRoute(world: index, width: world.3),
+                bouncePads: bounceRoute(world: index, width: world.3),
+                pickups: pickupRoute(world: index, width: world.3, firstPuppyX: firstPuppyX),
+                checkpoints: [world.3 * 0.28, world.3 * 0.72],
                 puppies: [
-                    PuppySpec(name: names[index * 2], frame: index * 2, position: CGPoint(x: 1_830 + CGFloat(index * 40), y: 58)),
-                    PuppySpec(name: names[index * 2 + 1], frame: index * 2 + 1, position: CGPoint(x: world.3 - 165, y: 58))
+                    PuppySpec(name: names[index * 2], frame: index * 2, position: CGPoint(x: firstPuppyX, y: 58), requiredSeals: 1),
+                    PuppySpec(name: names[index * 2 + 1], frame: index * 2 + 1, position: CGPoint(x: world.3 - 180, y: 58), requiredSeals: 3)
                 ]
             )
         }
     }()
 
-    private static func platformRoute(world: Int) -> [PlatformSpec] {
-        let lift = CGFloat(world % 3) * 7
-        let xs: [CGFloat] = [450, 750, 1_055, 1_365, 1_690, 2_020, 2_355, 2_700, 3_030, 3_365, 3_700]
-        return xs.enumerated().map { index, x in
-            let y: CGFloat = (index.isMultiple(of: 2) ? 105 : 170) + lift + CGFloat((index * 13 + world * 9) % 24)
+    private static func platformRoute(world: Int, width: CGFloat) -> [PlatformSpec] {
+        var result: [PlatformSpec] = []
+        var x: CGFloat = 430
+        var index = 0
+        while x < width - 280 {
+            let upperLane = (index + world) % 4 == 1 || (index + world) % 7 == 4
+            let y: CGFloat = (upperLane ? 176 : 104) + CGFloat((index * 17 + world * 11) % 22)
             let behavior: PlatformBehavior
-            if world >= 2 && index % 5 == 1 { behavior = .moving }
-            else if world >= 3 && index % 5 == 3 { behavior = .crumbling }
+            if world >= 1 && index % 6 == 2 { behavior = .moving }
+            else if world >= 2 && index % 7 == 5 { behavior = .crumbling }
             else { behavior = .fixed }
-            return PlatformSpec(
-                rect: CGRect(x: x + CGFloat(world * 20), y: y, width: 145 + CGFloat((index % 3) * 15), height: 24),
+            result.append(PlatformSpec(
+                rect: CGRect(x: x, y: y, width: 145 + CGFloat((index % 3) * 15), height: 24),
                 style: PlatformStyle.allCases[(index + world) % 3],
                 behavior: behavior
-            )
+            ))
+            x += 285 + CGFloat((index * 19 + world * 13) % 70)
+            index += 1
         }
+        return result
     }
 
-    private static func hazardRoute(world: Int) -> [HazardSpec] {
-        [640, 1_180, 1_610, 2_200, 2_900, 3_520].enumerated().map { index, x in
+    private static func hazardRoute(world: Int, width: CGFloat) -> [HazardSpec] {
+        var result: [HazardSpec] = []
+        var x: CGFloat = 670
+        var index = 0
+        while x < width - 250 {
             let style = HazardStyle.allCases[(index + world) % 3]
-            return HazardSpec(
-                rect: CGRect(x: CGFloat(x + world * 22), y: 53, width: style == .hedge ? 68 : 88, height: style == .hedge ? 40 : 17),
+            result.append(HazardSpec(
+                rect: CGRect(x: x, y: 53, width: style == .hedge ? 68 : 88, height: style == .hedge ? 40 : 17),
                 style: style
-            )
+            ))
+            x += 455 + CGFloat((index * 23 + world * 17) % 115)
+            index += 1
         }
+        return result
     }
 
-    private static func pickupRoute(offset: CGFloat) -> [PickupSpec] {
-        let route: [(CGFloat, CGFloat)] = [
-            (245, 110), (330, 150), (420, 188), (525, 150), (610, 170),
-            (785, 215), (875, 235), (1_050, 155), (1_145, 180),
-            (1_360, 230), (1_455, 250), (1_675, 170), (1_765, 195),
-            (2_000, 240), (2_095, 260), (2_330, 180), (2_430, 205),
-            (2_675, 230), (2_770, 255), (3_030, 150), (3_265, 205), (3_520, 165)
-        ]
-        var result = route.map { PickupSpec(position: CGPoint(x: $0.0 + offset, y: $0.1), style: .heart) }
-        result.append(PickupSpec(position: CGPoint(x: 1_490 + offset, y: 292), style: .goldenHeart))
-        result.append(PickupSpec(position: CGPoint(x: 2_810 + offset, y: 292), style: .letter))
+    private static func bounceRoute(world: Int, width: CGFloat) -> [CGPoint] {
+        var result: [CGPoint] = [CGPoint(x: 350, y: 58)]
+        var x: CGFloat = 1_550 + CGFloat(world * 35)
+        while x < width - 500 {
+            result.append(CGPoint(x: x, y: 58))
+            x += 1_350 + CGFloat((result.count % 2) * 170)
+        }
+        return result
+    }
+
+    private static func pickupRoute(world: Int, width: CGFloat, firstPuppyX: CGFloat) -> [PickupSpec] {
+        var result: [PickupSpec] = []
+        var x: CGFloat = 245
+        var index = 0
+        while x < width - 130 {
+            let wave = CGFloat((index * 37 + world * 29) % 135)
+            result.append(PickupSpec(position: CGPoint(x: x, y: 105 + wave), style: .heart))
+            x += 145 + CGFloat((index + world) % 3) * 18
+            index += 1
+        }
+        let seals = [width * 0.18, width * 0.46, width * 0.79]
+        result.append(contentsOf: seals.map { PickupSpec(position: CGPoint(x: $0, y: 255), style: .letter) })
+        for goldenX in [width * 0.31, firstPuppyX - 360, width * 0.68, width * 0.9] {
+            result.append(PickupSpec(position: CGPoint(x: goldenX, y: 292), style: .goldenHeart))
+        }
         return result
     }
 }

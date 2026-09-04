@@ -8,11 +8,22 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(Set(LevelDefinition.all.flatMap(\.puppies).map(\.frame)).count, 12)
         XCTAssertEqual(Set(LevelDefinition.all.map(\.backgroundAsset)).count, 6)
         for level in LevelDefinition.all {
-            XCTAssertGreaterThanOrEqual(level.platforms.count, 8)
-            XCTAssertGreaterThanOrEqual(level.hazards.count, 4)
-            XCTAssertGreaterThanOrEqual(level.pickups.count, 22)
+            XCTAssertGreaterThanOrEqual(level.worldWidth, 7_200)
+            XCTAssertGreaterThanOrEqual(level.platforms.count, 20)
+            XCTAssertGreaterThanOrEqual(level.hazards.count, 12)
+            XCTAssertGreaterThanOrEqual(level.pickups.count, 45)
+            XCTAssertEqual(level.checkpoints.count, 2)
             XCTAssertEqual(level.puppies.count, 2)
             XCTAssertTrue(level.puppies.allSatisfy { $0.position.x < level.worldWidth })
+            XCTAssertGreaterThan(level.puppies[0].position.x, 3_900)
+            XCTAssertEqual(level.puppies.map(\.requiredSeals), [1, 3])
+            XCTAssertGreaterThanOrEqual((level.puppies[0].position.x - 125) / 265, 14.5)
+            let platformGaps = zip(level.platforms, level.platforms.dropFirst()).map { $1.rect.minX - $0.rect.minX }
+            XCTAssertLessThanOrEqual(platformGaps.max() ?? 0, 360)
+            let sealPositions = level.pickups.filter { $0.style == .letter }.map(\.position.x)
+            XCTAssertEqual(sealPositions.count, 3)
+            XCTAssertGreaterThanOrEqual(sealPositions.filter { $0 < level.puppies[0].position.x }.count, 1)
+            XCTAssertTrue(sealPositions.allSatisfy { $0 < level.puppies[1].position.x })
         }
     }
 

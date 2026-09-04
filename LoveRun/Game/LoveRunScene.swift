@@ -38,6 +38,9 @@ final class LoveRunScene: SKScene {
     private var comboTime: TimeInterval = 0
     private var love = 0
     private var totalLove = 1
+    private var rescueSeals = 0
+    private var checkpointX: CGFloat = 125
+    private var activatedCheckpoints: Set<Int> = []
     private var pickups: [SKNode] = []
     private var puppyNodes: [SKSpriteNode] = []
     private var rescuedInLevel: Set<Int> = []
@@ -91,8 +94,11 @@ final class LoveRunScene: SKScene {
                 startReadySequence()
             }
             if ProcessInfo.processInfo.environment["LOVE_RUN_START_AT_PUPPY"] == "1" {
+                rescueSeals = 3
                 player.position.x = level.puppies[0].position.x - 105
                 cameraNode.position.x = player.position.x
+                updatePuppyGateLabels()
+                updateHUD()
             }
             if let rawPlatform = ProcessInfo.processInfo.environment["LOVE_RUN_START_PLATFORM_INDEX"],
                let platformIndex = Int(rawPlatform),
@@ -101,6 +107,16 @@ final class LoveRunScene: SKScene {
                 player.position = CGPoint(x: platform.rect.midX, y: platform.rect.maxY)
                 player.standStill(facing: 1)
                 cameraNode.position.x = max(size.width / 2, player.position.x)
+            }
+            if let rawX = ProcessInfo.processInfo.environment["LOVE_RUN_START_X"], let x = Double(rawX) {
+                player.position = CGPoint(x: min(max(125, CGFloat(x)), level.worldWidth - 125), y: groundY)
+                player.standStill(facing: 1)
+                cameraNode.position.x = max(size.width / 2, player.position.x)
+            }
+            if let rawSeals = ProcessInfo.processInfo.environment["LOVE_RUN_START_SEALS"], let seals = Int(rawSeals) {
+                rescueSeals = min(max(0, seals), 3)
+                updatePuppyGateLabels()
+                updateHUD()
             }
         }
     }
@@ -132,6 +148,9 @@ final class LoveRunScene: SKScene {
         puppyNodes.removeAll()
         rescuedInLevel.removeAll()
         heldTouches.removeAll()
+        rescueSeals = 0
+        checkpointX = 125
+        activatedCheckpoints.removeAll()
         backdrop.texture = SKTexture(imageNamed: level.backgroundAsset)
         backdrop.texture?.filteringMode = .linear
         buildGround()
@@ -140,6 +159,7 @@ final class LoveRunScene: SKScene {
         level.hazards.forEach(buildHazard)
         level.bouncePads.forEach(buildBouncePad)
         level.pickups.forEach(buildPickup)
+        buildCheckpoints()
         buildPuppies()
         buildFriend()
         player.removeAllActions()
@@ -203,11 +223,12 @@ final class LoveRunScene: SKScene {
     }
 
     private func buildPetals() {
-        for index in 0..<64 {
+        let petalCount = Int(level.worldWidth / 55)
+        for index in 0..<petalCount {
             let petal = SKShapeNode(ellipseOf: CGSize(width: 7, height: 3.5))
             petal.fillColor = index.isMultiple(of: 4) ? .yellow : UIColor(red: 1, green: 0.32, blue: 0.69, alpha: 0.78)
             petal.strokeColor = .clear
-            petal.position = CGPoint(x: CGFloat(index) / 64 * level.worldWidth, y: 74 + CGFloat((index * 53) % 245))
+            petal.position = CGPoint(x: CGFloat(index) / CGFloat(petalCount) * level.worldWidth, y: 74 + CGFloat((index * 53) % 245))
             petal.zRotation = CGFloat(index % 8) * 0.4
             petal.zPosition = 3
             petal.run(.repeatForever(.sequence([.moveBy(x: 24, y: -12, duration: 1.8), .moveBy(x: -24, y: 12, duration: 0)])))
@@ -228,14 +249,15 @@ final class LoveRunScene: SKScene {
         let texture = Self.objectTexture(column: cell.0, row: cell.1, crop: CGRect(x: 0.02, y: 0.18, width: 0.96, height: 0.62))
         let platform = SKSpriteNode(texture: texture)
         platform.anchorPoint = CGPoint(x: 0.5, y: 0.78)
-        platform.size = CGSize(width: spec.rect.width + 14, height: spec.style == .cloud ? 66 : 58)
+        let platformWidth = spec.rect.width + 14
+        let platformHeight = platformWidth / (0.96 / 0.62)
+        platform.size = CGSize(width: platformWidth, height: platformHeight)
         // Each atlas cell has different transparent padding above its painted surface.
         // These offsets put the visible top exactly at the collision rect's maxY.
         let artworkOffset: CGFloat
         switch spec.style {
-        case .stone: artworkOffset = 20
-        case .picnic: artworkOffset = -3
-        case .cloud: artworkOffset = -4
+        case .stone: artworkOffset = platformHeight * 0.29
+        case .picnic, .cloud: artworkOffset = -platformHeight * 0.08
         }
         platform.position.y = spec.rect.height / 2 + artworkOffset
         root.addChild(platform)
@@ -299,7 +321,7 @@ final class LoveRunScene: SKScene {
             node.size = CGSize(width: 76, height: 76)
         case .letter:
             node = SKSpriteNode(texture: Self.objectTexture(column: 2, row: 0))
-            node.size = CGSize(width: 67, height: 58)
+            node.size = CGSize(width: 62, height: 62)
         }
         node.name = spec.style.rawValue
         node.position = spec.position
@@ -307,6 +329,33 @@ final class LoveRunScene: SKScene {
         node.run(.repeatForever(.sequence([.moveBy(x: 0, y: 7, duration: 0.55), .moveBy(x: 0, y: -7, duration: 0.55)])))
         world.addChild(node)
         pickups.append(node)
+    }
+
+    private func buildCheckpoints() {
+        for (index, x) in level.checkpoints.enumerated() {
+            let root = SKNode()
+            root.name = "checkpoint\(index)"
+            root.position = CGPoint(x: x, y: groundY)
+            root.zPosition = 24
+            let aura = SKSpriteNode(texture: Self.objectTexture(column: 2, row: 2))
+            aura.size = CGSize(width: 70, height: 70)
+            aura.position.y = 36
+            aura.alpha = 0.7
+            root.addChild(aura)
+            let heart = SKSpriteNode(texture: Self.objectTexture(column: 1, row: 0))
+            heart.size = CGSize(width: 38, height: 38)
+            heart.position.y = 37
+            root.addChild(heart)
+            let label = SKLabelNode(fontNamed: "AvenirNext-Heavy")
+            label.name = "checkpointLabel"
+            label.text = "CHECKPOINT"
+            label.fontSize = 11
+            label.fontColor = .yellow
+            label.position.y = 72
+            root.addChild(label)
+            root.run(.repeatForever(.sequence([.scale(to: 1.05, duration: 0.55), .scale(to: 1, duration: 0.55)])))
+            world.addChild(root)
+        }
     }
 
     private func buildPuppies() {
@@ -329,7 +378,7 @@ final class LoveRunScene: SKScene {
 
             let label = SKLabelNode(fontNamed: "AvenirNext-Heavy")
             label.name = "puppyLabel\(index)"
-            label.text = "RESCUE \(spec.name.uppercased())"
+            label.text = gateLabel(for: spec, index: index)
             label.fontSize = 14
             label.fontColor = .yellow
             label.position = CGPoint(x: spec.position.x, y: 164)
@@ -349,6 +398,25 @@ final class LoveRunScene: SKScene {
             .rotate(toAngle: 0.025, duration: 0.55)
         ])))
         world.addChild(friend)
+    }
+
+    private func canRescuePuppy(at index: Int) -> Bool {
+        rescueSeals >= level.puppies[index].requiredSeals && (index == 0 || rescuedInLevel.contains(index - 1))
+    }
+
+    private func gateLabel(for puppy: PuppySpec, index: Int) -> String {
+        if index > 0, !rescuedInLevel.contains(index - 1) { return "LOCKED • SAVE PUPPY 1" }
+        return rescueSeals >= puppy.requiredSeals
+            ? "RESCUE \(puppy.name.uppercased())"
+            : "LOCKED • \(puppy.requiredSeals) SEAL\(puppy.requiredSeals == 1 ? "" : "S")"
+    }
+
+    private func updatePuppyGateLabels() {
+        for (index, puppy) in level.puppies.enumerated() where !rescuedInLevel.contains(index) {
+            guard let label = world.childNode(withName: "puppyLabel\(index)") as? SKLabelNode else { continue }
+            label.text = gateLabel(for: puppy, index: index)
+            label.fontColor = canRescuePuppy(at: index) ? .yellow : UIColor(red: 1, green: 0.55, blue: 0.82, alpha: 1)
+        }
     }
 
     private func buildHUD() {
@@ -391,9 +459,9 @@ final class LoveRunScene: SKScene {
         loveFillCrop.maskNode = loveFillMask
         loveFillCrop.addChild(loveFill)
         hud.addChild(loveFillCrop)
-        configure(leftButton, at: CGPoint(x: -352, y: -132), size: CGSize(width: 82, height: 82))
-        configure(rightButton, at: CGPoint(x: -264, y: -132), size: CGSize(width: 82, height: 82))
-        configure(jumpButton, at: CGPoint(x: 342, y: -128), size: CGSize(width: 136, height: 99))
+        configure(leftButton, at: CGPoint(x: -352, y: -132), size: CGSize(width: 82, height: 85))
+        configure(rightButton, at: CGPoint(x: -264, y: -132), size: CGSize(width: 82, height: 89))
+        configure(jumpButton, at: CGPoint(x: 342, y: -128), size: CGSize(width: 136, height: 112))
     }
 
     private func configure(_ button: SKSpriteNode, at position: CGPoint, size: CGSize) {
@@ -463,6 +531,7 @@ final class LoveRunScene: SKScene {
         updatePlatforms(currentTime)
         updatePlayer(dt)
         updatePickups(dt)
+        updateCheckpoints()
         updateCamera()
     }
 
@@ -542,7 +611,8 @@ final class LoveRunScene: SKScene {
         comboTime = 0
         invincible = 1.5
         velocity = CGVector(dx: -facing * 100, dy: 380)
-        player.position.x = max(105, player.position.x - 70)
+        player.position.x = player.position.y < -70 ? checkpointX : max(checkpointX, player.position.x - 70)
+        if player.position.y < -70 { player.position.y = groundY }
         burst(at: CGPoint(x: player.position.x, y: player.position.y + 45), colors: [UIColor.purple, .white], count: 15)
         UINotificationFeedbackGenerator().notificationOccurred(.error)
         player.run(.repeat(.sequence([.fadeAlpha(to: 0.25, duration: 0.09), .fadeAlpha(to: 1, duration: 0.09)]), count: 6))
@@ -556,10 +626,32 @@ final class LoveRunScene: SKScene {
             if rect.contains(node.position) { collect(node) }
         }
         for (index, puppy) in puppyNodes.enumerated() where !rescuedInLevel.contains(index) {
-            if abs(player.position.x - puppy.position.x) < 68, player.position.y < 175 {
+            if abs(player.position.x - puppy.position.x) < 68,
+               player.position.y < 175,
+               canRescuePuppy(at: index) {
                 rescuePuppy(index: index)
                 break
             }
+        }
+    }
+
+    private func updateCheckpoints() {
+        for (index, x) in level.checkpoints.enumerated() where !activatedCheckpoints.contains(index) {
+            guard abs(player.position.x - x) < 45 else { continue }
+            activatedCheckpoints.insert(index)
+            checkpointX = x
+            score += 500
+            if let node = world.childNode(withName: "checkpoint\(index)") {
+                node.removeAllActions()
+                if let label = node.childNode(withName: "checkpointLabel") as? SKLabelNode {
+                    label.text = "SAVED!"
+                    label.run(.sequence([.scale(to: 1.25, duration: 0.14), .fadeOut(withDuration: 0.65)]))
+                }
+                node.run(.sequence([.scale(to: 1.2, duration: 0.14), .scale(to: 1, duration: 0.16), .fadeAlpha(to: 0.42, duration: 0.5)]))
+            }
+            burst(at: CGPoint(x: x, y: 105), colors: [.yellow, .systemPink, .white], count: 24)
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            updateHUD()
         }
     }
 
@@ -573,7 +665,11 @@ final class LoveRunScene: SKScene {
         love += value
         score += base * min(combo, 5)
         if style == .goldenHeart { invincible = max(invincible, 3) }
-        if style == .letter { health = min(3, health + 1) }
+        if style == .letter {
+            health = min(3, health + 1)
+            rescueSeals = min(3, rescueSeals + 1)
+            updatePuppyGateLabels()
+        }
         player.setSmileLevel(min(5, love / 4))
         burst(at: node.position, colors: style == .goldenHeart ? [.yellow, .white, .systemPink] : [.systemPink, .white], count: 18)
         node.removeFromParent()
@@ -586,6 +682,7 @@ final class LoveRunScene: SKScene {
         let puppy = puppyNodes[index]
         let spec = level.puppies[index]
         rescuedInLevel.insert(index)
+        checkpointX = player.position.x
         rescued += 1
         score += 2_500
         state = .celebrating
@@ -596,6 +693,7 @@ final class LoveRunScene: SKScene {
         burst(at: CGPoint(x: puppy.position.x, y: puppy.position.y + 80), colors: [.systemPink, .yellow, .white], count: 30)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         world.childNode(withName: "puppyLabel\(index)")?.removeFromParent()
+        updatePuppyGateLabels()
         puppy.removeAllActions()
         puppy.run(.sequence([
             .group([.move(to: CGPoint(x: player.position.x + 58 * facing, y: player.position.y + 5), duration: 0.45), .scale(to: 1.2, duration: 0.45)]),
@@ -667,14 +765,15 @@ final class LoveRunScene: SKScene {
         }
         levelLabel.text = "LEVEL \(levelIndex + 1)  •  \(level.name)"
         comboLabel.text = combo > 1 ? "×\(combo) COMBO" : ""
-        puppyLabel.text = "PUPPIES \(rescued)/12"
+        puppyLabel.fontSize = 11
+        puppyLabel.text = "RESCUES \(rescued)/12  •  SEALS \(rescueSeals)/3"
         loveFillMask.xScale = max(0.015, min(1, CGFloat(love) / CGFloat(totalLove)))
     }
 
     private func showStageCard() {
         messages.removeAllChildren()
         let frame = SKSpriteNode(texture: SKTexture(imageNamed: "CelebrationFrame"))
-        frame.size = CGSize(width: 520, height: 265)
+        frame.size = CGSize(width: 520, height: 347)
         frame.zPosition = 190
         messages.addChild(frame)
         let eyebrow = SKLabelNode(fontNamed: "AvenirNext-Heavy")
@@ -724,7 +823,7 @@ final class LoveRunScene: SKScene {
         messages.addChild(flash)
         flash.run(.sequence([.fadeOut(withDuration: 0.2), .removeFromParent()]))
         let frame = SKSpriteNode(texture: SKTexture(imageNamed: "CelebrationFrame"))
-        frame.size = CGSize(width: 560, height: 286)
+        frame.size = CGSize(width: 560, height: 373)
         frame.zPosition = 200
         frame.setScale(0.4)
         messages.addChild(frame)
@@ -861,9 +960,9 @@ final class LoveRunScene: SKScene {
     private static func controlTexture(index: Int) -> SKTexture {
         let sheet = SKTexture(imageNamed: "CrystalControls")
         let rects = [
-            CGRect(x: 0, y: 0, width: 0.29, height: 1),
-            CGRect(x: 0.29, y: 0, width: 0.29, height: 1),
-            CGRect(x: 0.56, y: 0, width: 0.44, height: 1)
+            CGRect(x: 0.008, y: 0.14, width: 0.28, height: 0.80),
+            CGRect(x: 0.297, y: 0.14, width: 0.269, height: 0.80),
+            CGRect(x: 0.564, y: 0.013, width: 0.436, height: 0.987)
         ]
         let texture = SKTexture(rect: rects[index], in: sheet)
         texture.filteringMode = .linear
