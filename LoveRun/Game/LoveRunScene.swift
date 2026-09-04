@@ -62,9 +62,9 @@ final class LoveRunScene: SKScene {
     private let loveFill = SKSpriteNode()
     private let loveFillMask = SKSpriteNode(color: .white, size: CGSize(width: 190, height: 34))
     private let loveFillCrop = SKCropNode()
-    private let leftButton = SKShapeNode(circleOfRadius: 34)
-    private let rightButton = SKShapeNode(circleOfRadius: 34)
-    private let jumpButton = SKShapeNode(circleOfRadius: 42)
+    private let leftButton = SKSpriteNode(texture: LoveRunScene.controlTexture(index: 0))
+    private let rightButton = SKSpriteNode(texture: LoveRunScene.controlTexture(index: 1))
+    private let jumpButton = SKSpriteNode(texture: LoveRunScene.controlTexture(index: 2))
 
     override func didMove(to view: SKView) {
         backgroundColor = UIColor(red: 0.14, green: 0.01, blue: 0.18, alpha: 1)
@@ -162,6 +162,7 @@ final class LoveRunScene: SKScene {
         state = .ready
         direction = 0
         velocity = .zero
+        player.standStill(facing: facing)
         setControls(hidden: true)
         showStageCard()
         run(.sequence([
@@ -374,24 +375,16 @@ final class LoveRunScene: SKScene {
         loveFillCrop.maskNode = loveFillMask
         loveFillCrop.addChild(loveFill)
         hud.addChild(loveFillCrop)
-        configure(leftButton, text: "◀", at: CGPoint(x: -352, y: -137), font: 28)
-        configure(rightButton, text: "▶", at: CGPoint(x: -270, y: -137), font: 28)
-        configure(jumpButton, text: "JUMP", at: CGPoint(x: 348, y: -133), font: 14)
+        configure(leftButton, at: CGPoint(x: -352, y: -132), size: CGSize(width: 82, height: 82))
+        configure(rightButton, at: CGPoint(x: -264, y: -132), size: CGSize(width: 82, height: 82))
+        configure(jumpButton, at: CGPoint(x: 342, y: -128), size: CGSize(width: 136, height: 99))
     }
 
-    private func configure(_ button: SKShapeNode, text: String, at position: CGPoint, font: CGFloat) {
+    private func configure(_ button: SKSpriteNode, at position: CGPoint, size: CGSize) {
         button.position = position
-        button.fillColor = UIColor(red: 0.95, green: 0.04, blue: 0.48, alpha: 0.52)
-        button.strokeColor = UIColor(red: 1, green: 0.77, blue: 0.16, alpha: 1)
-        button.lineWidth = 3
-        button.glowWidth = 3
+        button.size = size
+        button.alpha = 0.9
         button.zPosition = 110
-        let label = SKLabelNode(fontNamed: "AvenirNext-Heavy")
-        label.text = text
-        label.fontSize = font
-        label.fontColor = .white
-        label.verticalAlignmentMode = .center
-        button.addChild(label)
         hud.addChild(button)
     }
 
@@ -436,11 +429,12 @@ final class LoveRunScene: SKScene {
         direction = newDirection
         if direction != 0 { facing = direction }
         if wantsJump { jumpBuffer = 0.13 }
-        let normal = UIColor(red: 0.95, green: 0.04, blue: 0.48, alpha: 0.52)
-        let active = UIColor(red: 1, green: 0.20, blue: 0.63, alpha: 0.9)
-        leftButton.fillColor = direction < 0 ? active : normal
-        rightButton.fillColor = direction > 0 ? active : normal
-        jumpButton.fillColor = wantsJump ? active : normal
+        leftButton.setScale(direction < 0 ? 1.12 : 1)
+        rightButton.setScale(direction > 0 ? 1.12 : 1)
+        jumpButton.setScale(wantsJump ? 1.1 : 1)
+        leftButton.alpha = direction < 0 ? 1 : 0.9
+        rightButton.alpha = direction > 0 ? 1 : 0.9
+        jumpButton.alpha = wantsJump ? 1 : 0.9
     }
 
     override func update(_ currentTime: TimeInterval) {
@@ -581,6 +575,7 @@ final class LoveRunScene: SKScene {
         state = .celebrating
         direction = 0
         velocity = .zero
+        player.standStill(facing: facing)
         setControls(hidden: true)
         burst(at: CGPoint(x: puppy.position.x, y: puppy.position.y + 80), colors: [.systemPink, .yellow, .white], count: 30)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -843,6 +838,18 @@ final class LoveRunScene: SKScene {
             rect: CGRect(x: CGFloat(frame) / 4 + inset, y: 0.03, width: 0.25 - inset * 2, height: 0.94),
             in: sheet
         )
+        texture.filteringMode = .linear
+        return texture
+    }
+
+    private static func controlTexture(index: Int) -> SKTexture {
+        let sheet = SKTexture(imageNamed: "CrystalControls")
+        let rects = [
+            CGRect(x: 0, y: 0, width: 0.29, height: 1),
+            CGRect(x: 0.29, y: 0, width: 0.29, height: 1),
+            CGRect(x: 0.56, y: 0, width: 0.44, height: 1)
+        ]
+        let texture = SKTexture(rect: rects[index], in: sheet)
         texture.filteringMode = .linear
         return texture
     }

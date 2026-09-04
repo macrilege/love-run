@@ -5,7 +5,7 @@ final class PlayerNode: SKNode {
 
     private let runner = SKSpriteNode()
     private let runTextures: [SKTexture]
-    private let idleTextures: [SKTexture]
+    private let idleTexture: SKTexture
     private let jumpTextures: [SKTexture]
     private let sparkles = SKNode()
     private var isRunningAnimationActive = false
@@ -32,19 +32,10 @@ final class PlayerNode: SKNode {
         }
 
         let idleSheet = SKTexture(imageNamed: "BlondeRunnerIdle")
-        // The generated poses are not centered identically inside their four atlas cells.
-        // Crop each around the planted foot/body axis so the idle cycle breathes without drifting.
-        let idleRects = [
-            CGRect(x: 0.0866, y: 0.03, width: 0.1427, height: 0.94),
-            CGRect(x: 0.3218, y: 0.03, width: 0.1427, height: 0.94),
-            CGRect(x: 0.5585, y: 0.03, width: 0.1427, height: 0.94),
-            CGRect(x: 0.7827, y: 0.03, width: 0.1427, height: 0.94)
-        ]
-        idleTextures = idleRects.map { rect in
-            let texture = SKTexture(rect: rect, in: idleSheet)
-            texture.filteringMode = .linear
-            return texture
-        }
+        // A single planted pose is intentional. Cycling separately generated poses made
+        // her feet and silhouette slide even when the player node itself never moved.
+        idleTexture = SKTexture(rect: CGRect(x: 0.0866, y: 0.03, width: 0.1427, height: 0.94), in: idleSheet)
+        idleTexture.filteringMode = .linear
 
         let jumpSheet = SKTexture(imageNamed: "BlondeRunnerJump")
         jumpTextures = (0..<4).map { index in
@@ -125,16 +116,23 @@ final class PlayerNode: SKNode {
                 runner.position.y = -4
                 runner.zRotation = 0
                 if !isIdleAnimationActive {
-                    runner.texture = idleTextures[0]
+                    runner.texture = idleTexture
                     runner.size = idleSize
                     runner.run(
-                        .repeatForever(.animate(with: idleTextures, timePerFrame: 0.22, resize: false, restore: false)),
+                        .repeatForever(.sequence([
+                            .scaleX(to: 1.006, y: 0.994, duration: 0.7),
+                            .scaleX(to: 1, y: 1, duration: 0.7)
+                        ])),
                         withKey: "idleCycle"
                     )
                     isIdleAnimationActive = true
                 }
             }
         }
+    }
+
+    func standStill(facing: CGFloat) {
+        updateAnimation(deltaTime: 0, moving: false, airborne: false, facing: facing)
     }
 
     private func stopRunningAnimation() {
@@ -146,6 +144,7 @@ final class PlayerNode: SKNode {
     private func stopIdleAnimation() {
         guard isIdleAnimationActive else { return }
         runner.removeAction(forKey: "idleCycle")
+        runner.setScale(1)
         isIdleAnimationActive = false
     }
 
