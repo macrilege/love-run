@@ -27,6 +27,7 @@ final class LoveRunScene: SKScene {
     private let world = SKNode()
     private let cameraNode = SKCameraNode()
     private let backdrop = SKSpriteNode()
+    private let transitionBackdrop = SKSpriteNode()
     private let tint = SKSpriteNode(color: UIColor(red: 0.32, green: 0.01, blue: 0.30, alpha: 0.08), size: CGSize(width: 900, height: 430))
     private let hud = SKNode()
     private let overlay = SKNode()
@@ -58,6 +59,8 @@ final class LoveRunScene: SKScene {
     private var invincibleTime: TimeInterval = 0
     private var companionShield = false
     private var previousTime: TimeInterval = 0
+    private var backgroundStage = 0
+    private var backgroundTransitioning = false
     private var touchStarts: [UITouch: CGPoint] = [:]
     private var currentLevel: LevelDefinition { LevelDefinition.all[missionIndex] }
 
@@ -82,6 +85,10 @@ final class LoveRunScene: SKScene {
         backdrop.size = CGSize(width: size.width, height: size.width * 941 / 1_672)
         backdrop.zPosition = -100
         cameraNode.addChild(backdrop)
+        transitionBackdrop.size = backdrop.size
+        transitionBackdrop.zPosition = -99
+        transitionBackdrop.alpha = 0
+        cameraNode.addChild(transitionBackdrop)
         tint.zPosition = -90
         cameraNode.addChild(tint)
         cameraNode.addChild(hud)
@@ -110,6 +117,12 @@ final class LoveRunScene: SKScene {
                 setControls(hidden: false)
                 updateHUD()
             }
+            if ProcessInfo.processInfo.environment["LOVE_RUN_PREVIEW_TWIRL"] == "1" {
+                player.run(.repeatForever(.sequence([
+                    .run { [weak self] in self?.player.performTwirl() },
+                    .wait(forDuration: 0.65)
+                ])), withKey: "previewTwirl")
+            }
         }
     }
 
@@ -136,6 +149,8 @@ final class LoveRunScene: SKScene {
         world.removeAllChildren()
         backdrop.texture = SKTexture(imageNamed: "BloomingPark")
         backdrop.texture?.filteringMode = .linear
+        transitionBackdrop.removeAllActions()
+        transitionBackdrop.alpha = 0
         tint.color = UIColor(red: 1, green: 0.72, blue: 0.86, alpha: 0.25)
         cameraNode.position = CGPoint(x: size.width / 2, y: size.height / 2)
         let floor = SKSpriteNode(color: UIColor(red: 0.25, green: 0.01, blue: 0.20, alpha: 0.55), size: CGSize(width: size.width, height: 62))
@@ -202,6 +217,8 @@ final class LoveRunScene: SKScene {
         state = .sanctuary
         world.removeAllChildren()
         backdrop.texture = SKTexture(imageNamed: "BloomingPark")
+        transitionBackdrop.removeAllActions()
+        transitionBackdrop.alpha = 0
         tint.color = UIColor(red: 1, green: 0.72, blue: 0.86, alpha: 0.27)
         cameraNode.position = CGPoint(x: size.width / 2, y: size.height / 2)
         hud.isHidden = true
@@ -274,8 +291,12 @@ final class LoveRunScene: SKScene {
         pickups.removeAll()
         puppyNode = nil
         rescuedPuppy = nil
-        backdrop.texture = SKTexture(imageNamed: currentLevel.backgroundAsset)
+        backdrop.texture = SKTexture(imageNamed: missionBackgrounds[0])
         backdrop.texture?.filteringMode = .linear
+        transitionBackdrop.removeAllActions()
+        transitionBackdrop.alpha = 0
+        backgroundStage = 0
+        backgroundTransitioning = false
         let tintColors = [
             UIColor(red: 1, green: 0.88, blue: 0.93, alpha: 0.55),
             UIColor(red: 0.88, green: 0.94, blue: 1, alpha: 0.54),
@@ -698,8 +719,35 @@ final class LoveRunScene: SKScene {
         updatePickups(dt)
         updateCheckpoint()
         updatePuppyFollower(dt)
+        updateBackground()
         updateCamera()
         updateHUD()
+    }
+
+    private var missionBackgrounds: [String] {
+        switch missionIndex {
+        case 0: return ["BloomingPark", "ParisFashionDistrict", "SunsetRooftops"]
+        case 1: return ["BloomingPark", "CandyBoardwalk", "CrystalHeartPalace"]
+        default: return ["NeonMoonGarden", "SunsetRooftops", "CrystalHeartPalace"]
+        }
+    }
+
+    private func updateBackground() {
+        let progress = min(0.999, max(0, player.position.x / currentLevel.exitX))
+        let requestedStage = min(missionBackgrounds.count - 1, Int(progress * CGFloat(missionBackgrounds.count)))
+        guard requestedStage > backgroundStage, !backgroundTransitioning else { return }
+        backgroundTransitioning = true
+        let texture = SKTexture(imageNamed: missionBackgrounds[requestedStage])
+        texture.filteringMode = .linear
+        transitionBackdrop.texture = texture
+        transitionBackdrop.alpha = 0
+        transitionBackdrop.run(.fadeIn(withDuration: 0.85)) { [weak self] in
+            guard let self else { return }
+            self.backdrop.texture = texture
+            self.transitionBackdrop.alpha = 0
+            self.backgroundStage = requestedStage
+            self.backgroundTransitioning = false
+        }
     }
 
     private func updatePlayer(_ dt: TimeInterval) {

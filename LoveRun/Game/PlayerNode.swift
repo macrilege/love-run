@@ -7,9 +7,11 @@ final class PlayerNode: SKNode {
     private let runTextures: [SKTexture]
     private let idleTexture: SKTexture
     private let jumpTextures: [SKTexture]
+    private let twirlTextures: [SKTexture]
     private let sparkles = SKNode()
     private var isRunningAnimationActive = false
     private var isIdleAnimationActive = false
+    private var isTwirlAnimationActive = false
     private var animationClock: CGFloat = 0
 
     private let runningSize = CGSize(width: 134, height: 134)
@@ -42,6 +44,16 @@ final class PlayerNode: SKNode {
             let texture = SKTexture(
                 rect: CGRect(x: CGFloat(index) / 4 + 0.0125, y: 0.14, width: 0.225, height: 0.78),
                 in: jumpSheet
+            )
+            texture.filteringMode = .linear
+            return texture
+        }
+
+        let twirlSheet = SKTexture(imageNamed: "BlondeRunnerTwirl")
+        twirlTextures = (0..<6).map { index in
+            let texture = SKTexture(
+                rect: CGRect(x: CGFloat(index) / 6, y: 0, width: 1.0 / 6.0, height: 1),
+                in: twirlSheet
             )
             texture.filteringMode = .linear
             return texture
@@ -88,7 +100,10 @@ final class PlayerNode: SKNode {
 
     func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat, verticalVelocity: CGFloat = 0, sliding: Bool = false) {
         xScale = facing
-        if sliding {
+        if isTwirlAnimationActive {
+            runner.position.y = -2
+            runner.zRotation = 0
+        } else if sliding {
             stopRunningAnimation()
             stopIdleAnimation()
             runner.texture = runTextures[2]
@@ -164,8 +179,17 @@ final class PlayerNode: SKNode {
     }
 
     func performTwirl() {
-        removeAction(forKey: "airTwirl")
-        run(.rotate(byAngle: .pi * 2, duration: 0.30), withKey: "airTwirl")
+        stopRunningAnimation()
+        stopIdleAnimation()
+        runner.removeAction(forKey: "twirlCycle")
+        runner.zRotation = 0
+        runner.position.y = -2
+        runner.size = CGSize(width: 92, height: 170)
+        isTwirlAnimationActive = true
+        runner.run(.sequence([
+            .animate(with: twirlTextures, timePerFrame: 0.055, resize: false, restore: false),
+            .run { [weak self] in self?.isTwirlAnimationActive = false }
+        ]), withKey: "twirlCycle")
     }
 
 }
