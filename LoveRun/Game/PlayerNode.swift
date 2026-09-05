@@ -86,9 +86,16 @@ final class PlayerNode: SKNode {
         }
     }
 
-    func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat, verticalVelocity: CGFloat = 0) {
+    func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat, verticalVelocity: CGFloat = 0, sliding: Bool = false) {
         xScale = facing
-        if moving && !airborne {
+        if sliding {
+            stopRunningAnimation()
+            stopIdleAnimation()
+            runner.texture = runTextures[2]
+            runner.size = CGSize(width: 142, height: 82)
+            runner.position.y = -3
+            runner.zRotation = -0.07
+        } else if moving && !airborne {
             animationClock += deltaTime
             stopIdleAnimation()
             if !isRunningAnimationActive {
@@ -154,6 +161,11 @@ final class PlayerNode: SKNode {
             .scaleX(to: 1.06, y: 0.91, duration: 0.055),
             .scale(to: 1, duration: 0.085)
         ]), withKey: "landing")
+    }
+
+    func performTwirl() {
+        removeAction(forKey: "airTwirl")
+        run(.rotate(byAngle: .pi * 2, duration: 0.30), withKey: "airTwirl")
     }
 
 }

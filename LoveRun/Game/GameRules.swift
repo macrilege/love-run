@@ -14,4 +14,8 @@ enum GameRules {
     static func spawnInterval(for hearts: Int) -> TimeInterval {
         max(0.85, 2.0 - Double(hearts) * 0.055)
     }
+
+    static func crowns(letters: Int, totalLetters: Int, damageTaken: Int) -> Int {
+        1 + (letters >= totalLetters ? 1 : 0) + (damageTaken == 0 ? 1 : 0)
+    }
 }
