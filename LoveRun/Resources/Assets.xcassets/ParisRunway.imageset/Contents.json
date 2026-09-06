@@ -1,0 +1,13 @@
+{
+  "images" : [
+    {
+      "filename" : "paris-runway.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

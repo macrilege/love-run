@@ -311,9 +311,9 @@ final class LoveRunScene: SKScene {
         backgroundStage = 0
         backgroundTransitioning = false
         let tintColors = [
-            UIColor(red: 1, green: 0.88, blue: 0.93, alpha: 0.55),
-            UIColor(red: 0.88, green: 0.94, blue: 1, alpha: 0.54),
-            UIColor(red: 0.95, green: 0.88, blue: 0.97, alpha: 0.56)
+            UIColor(red: 1, green: 0.82, blue: 0.90, alpha: 0.10),
+            UIColor(red: 0.88, green: 0.92, blue: 1, alpha: 0.08),
+            UIColor(red: 0.84, green: 0.76, blue: 1, alpha: 0.07)
         ]
         tint.color = tintColors[missionIndex]
         buildGround()
@@ -344,17 +344,27 @@ final class LoveRunScene: SKScene {
         invincibleTime = 0
         previousTime = 0
         totalHearts = max(1, currentLevel.pickups.filter { $0.style != .letter }.count)
-        cameraNode.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        cameraNode.position = CGPoint(x: size.width / 2, y: gameplayCameraFloorY)
     }
 
     private func buildGround() {
-        let ground = SKSpriteNode(color: UIColor(red: 0.25, green: 0.02, blue: 0.22, alpha: 0.68), size: CGSize(width: currentLevel.worldWidth, height: groundY))
+        let groundColors = [
+            UIColor(red: 0.20, green: 0.25, blue: 0.14, alpha: 0.92),
+            UIColor(red: 0.25, green: 0.08, blue: 0.24, alpha: 0.92),
+            UIColor(red: 0.07, green: 0.08, blue: 0.28, alpha: 0.94)
+        ]
+        let ground = SKSpriteNode(color: groundColors[missionIndex], size: CGSize(width: currentLevel.worldWidth, height: groundY))
         ground.anchorPoint = .zero
         ground.zPosition = 1
         world.addChild(ground)
-        let edge = SKSpriteNode(color: UIColor(red: 1, green: 0.72, blue: 0.12, alpha: 1), size: CGSize(width: currentLevel.worldWidth, height: 3))
+        let glow = SKSpriteNode(color: UIColor(red: 1, green: 0.70, blue: 0.88, alpha: 0.18), size: CGSize(width: currentLevel.worldWidth, height: 12))
+        glow.anchorPoint = .zero
+        glow.position.y = groundY - 12
+        glow.zPosition = 2
+        world.addChild(glow)
+        let edge = SKSpriteNode(color: UIColor(red: 1, green: 0.78, blue: 0.30, alpha: 1), size: CGSize(width: currentLevel.worldWidth, height: 4))
         edge.anchorPoint = .zero
-        edge.position.y = groundY - 2
+        edge.position.y = groundY - 3
         edge.zPosition = 8
         world.addChild(edge)
     }
@@ -746,9 +756,9 @@ final class LoveRunScene: SKScene {
 
     private var missionBackgrounds: [String] {
         switch missionIndex {
-        case 0: return ["BloomingPark", "ParisFashionDistrict", "SunsetRooftops"]
-        case 1: return ["BloomingPark", "CandyBoardwalk", "CrystalHeartPalace"]
-        default: return ["NeonMoonGarden", "SunsetRooftops", "CrystalHeartPalace"]
+        case 0: return ["RoseGardenRunway", "ParisRunway", "CrystalMoonRunway"]
+        case 1: return ["ParisRunway", "RoseGardenRunway", "CrystalMoonRunway"]
+        default: return ["CrystalMoonRunway", "ParisRunway", "RoseGardenRunway"]
         }
     }
 
@@ -761,7 +771,7 @@ final class LoveRunScene: SKScene {
         texture.filteringMode = .linear
         transitionBackdrop.texture = texture
         transitionBackdrop.alpha = 0
-        transitionBackdrop.run(.fadeIn(withDuration: 0.85)) { [weak self] in
+        transitionBackdrop.run(.fadeIn(withDuration: 1.15)) { [weak self] in
             guard let self else { return }
             self.backdrop.texture = texture
             self.transitionBackdrop.alpha = 0
@@ -999,13 +1009,17 @@ final class LoveRunScene: SKScene {
         showResults(won: won, crowns: crowns)
     }
 
+    private var gameplayCameraFloorY: CGFloat {
+        size.height * cameraNode.yScale / 2
+    }
+
     private func updateCamera() {
         let visibleWidth = size.width * cameraNode.xScale
         let targetX = max(visibleWidth / 2, min(currentLevel.worldWidth - visibleWidth / 2, player.position.x + visibleWidth * 0.19))
-        let airborneLift = min(260, max(0, player.position.y - groundY) * 0.82)
-        let targetY = size.height / 2 + airborneLift
+        let visibleHeight = size.height * cameraNode.yScale
+        let targetY = max(gameplayCameraFloorY, player.position.y + visibleHeight * 0.10)
         cameraNode.position.x += (targetX - cameraNode.position.x) * 0.11
-        cameraNode.position.y += (targetY - cameraNode.position.y) * 0.10
+        cameraNode.position.y += (targetY - cameraNode.position.y) * 0.085
     }
 
     private func setCameraZoom(_ zoom: CGFloat) {
