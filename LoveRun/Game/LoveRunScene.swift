@@ -33,6 +33,7 @@ final class LoveRunScene: SKScene {
     private let overlay = SKNode()
     private let player = PlayerNode()
     private let groundY: CGFloat = 58
+    private let gameplayZoom: CGFloat = 1.28
 
     private var state: State = .title
     private var phase: RunPhase = .approach
@@ -61,6 +62,7 @@ final class LoveRunScene: SKScene {
     private var previousTime: TimeInterval = 0
     private var backgroundStage = 0
     private var backgroundTransitioning = false
+    private var debugFreezeMotion = false
     private var touchStarts: [UITouch: CGPoint] = [:]
     private var currentLevel: LevelDefinition { LevelDefinition.all[missionIndex] }
 
@@ -107,6 +109,14 @@ final class LoveRunScene: SKScene {
                 player.position.x = CGFloat(x)
                 cameraNode.position.x = max(size.width / 2, player.position.x)
             }
+            if let rawY = ProcessInfo.processInfo.environment["LOVE_RUN_START_Y"], let y = Double(rawY) {
+                player.position.y = CGFloat(y)
+                grounded = false
+            }
+            if let rawDY = ProcessInfo.processInfo.environment["LOVE_RUN_START_DY"], let dy = Double(rawDY) {
+                velocity.dy = CGFloat(dy)
+            }
+            debugFreezeMotion = ProcessInfo.processInfo.environment["LOVE_RUN_FREEZE_MOTION"] == "1"
             if let rawLetters = ProcessInfo.processInfo.environment["LOVE_RUN_START_LETTERS"], let count = Int(rawLetters) {
                 letters = min(3, max(0, count))
             }
@@ -147,6 +157,7 @@ final class LoveRunScene: SKScene {
 
     private func buildShowcase(showCast: Bool) {
         world.removeAllChildren()
+        setCameraZoom(1)
         backdrop.texture = SKTexture(imageNamed: "BloomingPark")
         backdrop.texture?.filteringMode = .linear
         transitionBackdrop.removeAllActions()
@@ -216,6 +227,7 @@ final class LoveRunScene: SKScene {
     private func showSanctuary() {
         state = .sanctuary
         world.removeAllChildren()
+        setCameraZoom(1)
         backdrop.texture = SKTexture(imageNamed: "BloomingPark")
         transitionBackdrop.removeAllActions()
         transitionBackdrop.alpha = 0
@@ -286,6 +298,7 @@ final class LoveRunScene: SKScene {
 
     private func loadMissionWorld() {
         world.removeAllChildren()
+        setCameraZoom(gameplayZoom)
         overlay.removeAllChildren()
         surfaces.removeAll()
         pickups.removeAll()
@@ -715,6 +728,13 @@ final class LoveRunScene: SKScene {
         jumpBuffer = max(0, jumpBuffer - dt)
         coyoteTime = grounded ? 0.1 : max(0, coyoteTime - dt)
         updatePlatforms(currentTime)
+        if debugFreezeMotion {
+            player.updateAnimation(deltaTime: dt, moving: true, airborne: player.position.y > groundY + 1, facing: 1, verticalVelocity: velocity.dy)
+            updateBackground()
+            updateCamera()
+            updateHUD()
+            return
+        }
         updatePlayer(dt)
         updatePickups(dt)
         updateCheckpoint()
@@ -805,7 +825,7 @@ final class LoveRunScene: SKScene {
         if player.position.y < -80 || (invincibleTime == 0 && currentLevel.hazards.contains(where: { hitbox.intersects($0.rect) })) {
             takeDamage(fell: player.position.y < -80)
         }
-        player.updateAnimation(deltaTime: dt, moving: true, airborne: !grounded, facing: 1, verticalVelocity: velocity.dy, sliding: slideTime > 0)
+        player.updateAnimation(deltaTime: dt, moving: true, airborne: !grounded, facing: 1, verticalVelocity: velocity.dy, sliding: slideTime > 0, movementSpeed: speed)
 
         if phase == .approach, player.position.x >= currentLevel.puppy.position.x - 55 {
             if letters >= 2 { rescuePuppy() }
@@ -980,8 +1000,20 @@ final class LoveRunScene: SKScene {
     }
 
     private func updateCamera() {
-        let target = max(size.width / 2, min(currentLevel.worldWidth - size.width / 2, player.position.x + size.width * 0.19))
-        cameraNode.position.x += (target - cameraNode.position.x) * 0.11
+        let visibleWidth = size.width * cameraNode.xScale
+        let targetX = max(visibleWidth / 2, min(currentLevel.worldWidth - visibleWidth / 2, player.position.x + visibleWidth * 0.19))
+        let airborneLift = min(260, max(0, player.position.y - groundY) * 0.82)
+        let targetY = size.height / 2 + airborneLift
+        cameraNode.position.x += (targetX - cameraNode.position.x) * 0.11
+        cameraNode.position.y += (targetY - cameraNode.position.y) * 0.10
+    }
+
+    private func setCameraZoom(_ zoom: CGFloat) {
+        cameraNode.setScale(zoom)
+        let width = size.width * zoom
+        backdrop.size = CGSize(width: width, height: width * 941 / 1_672)
+        transitionBackdrop.size = backdrop.size
+        tint.size = CGSize(width: size.width * zoom, height: size.height * zoom)
     }
 
     private func showStageCard() {

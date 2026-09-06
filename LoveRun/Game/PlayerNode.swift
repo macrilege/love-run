@@ -12,21 +12,15 @@ final class PlayerNode: SKNode {
     private var isRunningAnimationActive = false
     private var isIdleAnimationActive = false
     private var isTwirlAnimationActive = false
-    private var animationClock: CGFloat = 0
-
-    private let runningSize = CGSize(width: 134, height: 134)
+    private var runFrameDuration: TimeInterval = 0.06
+    private let runningSize = CGSize(width: 144, height: 144)
     private let idleSize = CGSize(width: 62, height: 134)
 
     override init() {
-        let sheet = SKTexture(imageNamed: "BlondeRunnerSmooth")
-        let cells = [
-            CGRect(x: 0, y: 0.5, width: 1.0 / 3.0, height: 0.5),
-            CGRect(x: 1.0 / 3.0, y: 0.5, width: 1.0 / 3.0, height: 0.5),
-            CGRect(x: 2.0 / 3.0, y: 0.5, width: 1.0 / 3.0, height: 0.5),
-            CGRect(x: 0, y: 0, width: 1.0 / 3.0, height: 0.5),
-            CGRect(x: 1.0 / 3.0, y: 0, width: 1.0 / 3.0, height: 0.5),
-            CGRect(x: 2.0 / 3.0, y: 0, width: 1.0 / 3.0, height: 0.5)
-        ]
+        let sheet = SKTexture(imageNamed: "BlondeRunnerRunV2")
+        let cells = [(0, 0), (2, 0), (3, 0), (0, 1), (2, 1), (3, 1)].map { column, row in
+            CGRect(x: CGFloat(column) / 4, y: row == 0 ? 0.5 : 0, width: 0.25, height: 0.5)
+        }
         runTextures = cells.map {
             let texture = SKTexture(rect: $0, in: sheet)
             texture.filteringMode = .linear
@@ -98,7 +92,7 @@ final class PlayerNode: SKNode {
         }
     }
 
-    func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat, verticalVelocity: CGFloat = 0, sliding: Bool = false) {
+    func updateAnimation(deltaTime: CGFloat, moving: Bool, airborne: Bool, facing: CGFloat, verticalVelocity: CGFloat = 0, sliding: Bool = false, movementSpeed: CGFloat = 250) {
         xScale = facing
         if isTwirlAnimationActive {
             runner.position.y = -2
@@ -111,18 +105,19 @@ final class PlayerNode: SKNode {
             runner.position.y = -3
             runner.zRotation = -0.07
         } else if moving && !airborne {
-            animationClock += deltaTime
             stopIdleAnimation()
-            if !isRunningAnimationActive {
+            let requestedDuration = max(0.05, min(0.085, TimeInterval(20 / max(1, movementSpeed))))
+            if !isRunningAnimationActive || abs(requestedDuration - runFrameDuration) > 0.003 {
+                runner.removeAction(forKey: "runCycle")
                 runner.size = runningSize
-                runner.run(.repeatForever(.animate(with: runTextures, timePerFrame: 0.07, resize: false, restore: false)), withKey: "runCycle")
+                runner.run(.repeatForever(.animate(with: runTextures, timePerFrame: requestedDuration, resize: false, restore: false)), withKey: "runCycle")
+                runFrameDuration = requestedDuration
                 isRunningAnimationActive = true
             }
-            runner.position.y = -4 + sin(animationClock / 0.42 * .pi * 2) * 0.8
+            runner.position.y = -4
             runner.zRotation = 0
         } else {
             stopRunningAnimation()
-            animationClock = 0
             if airborne {
                 stopIdleAnimation()
                 let frame: Int
